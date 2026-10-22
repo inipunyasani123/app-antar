@@ -48,6 +48,37 @@ const f = {
   sate: require('../../assets/images/menu/sate-ayam.webp'),
 };
 
+/** Versi kecil (256×192) untuk gambar menu di daftar; versi 640×480 untuk sampul & ubin. */
+const k = {
+  pecel: require('../../assets/images/menu/kecil/pecel.webp'),
+  urap: require('../../assets/images/menu/kecil/urap.webp'),
+  rempeyek: require('../../assets/images/menu/kecil/rempeyek.webp'),
+  tempe: require('../../assets/images/menu/kecil/tempe-goreng.webp'),
+  bakso: require('../../assets/images/menu/kecil/bakso.webp'),
+  mieAyam: require('../../assets/images/menu/kecil/mie-ayam.webp'),
+  esJeruk: require('../../assets/images/menu/kecil/es-jeruk.webp'),
+  nasiGoreng: require('../../assets/images/menu/kecil/nasi-goreng.webp'),
+  mieGoreng: require('../../assets/images/menu/kecil/mie-goreng.webp'),
+  mieRebus: require('../../assets/images/menu/kecil/mie-rebus.webp'),
+  geprek: require('../../assets/images/menu/kecil/ayam-geprek.webp'),
+  penyet: require('../../assets/images/menu/kecil/ayam-penyet.webp'),
+  tahu: require('../../assets/images/menu/kecil/tahu-goreng.webp'),
+  rawon: require('../../assets/images/menu/kecil/rawon.webp'),
+  soto: require('../../assets/images/menu/kecil/soto-ayam.webp'),
+  nasiCampur: require('../../assets/images/menu/kecil/nasi-campur.webp'),
+  klepon: require('../../assets/images/menu/kecil/klepon.webp'),
+  dadar: require('../../assets/images/menu/kecil/dadar-gulung.webp'),
+  pisang: require('../../assets/images/menu/kecil/pisang-goreng.webp'),
+  kolak: require('../../assets/images/menu/kecil/kolak.webp'),
+  getuk: require('../../assets/images/menu/kecil/getuk.webp'),
+  onde: require('../../assets/images/menu/kecil/onde-onde.webp'),
+  esKopi: require('../../assets/images/menu/kecil/es-kopi-susu.webp'),
+  kopi: require('../../assets/images/menu/kecil/kopi-tubruk.webp'),
+  uwuh: require('../../assets/images/menu/kecil/wedang-uwuh.webp'),
+  esTeh: require('../../assets/images/menu/kecil/es-teh.webp'),
+  sate: require('../../assets/images/menu/kecil/sate-ayam.webp'),
+};
+
 export const KATEGORI: Kategori[] = [
   { id: 'sarapan', nama: 'Sarapan', sapaan: 'Sarapan pagi', ket: 'Pecel, rawon, dan jajan pasar yang sudah siap sejak subuh. Pesan dari warung pagi di Tirtalaya, diantar selagi hangat.', foto: f.pecel },
   { id: 'nasi', nama: 'Nasi & lauk', sapaan: 'Nasi & lauk', ket: 'Ayam geprek, nasi goreng, nasi campur, dan lauk rumahan dari warung tetangga. Pilih menu, cek ongkir, lalu pesan.', foto: f.geprek },
@@ -110,16 +141,16 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Andalan',
         menu: [
-          { id: 'pecel-pincuk', nama: 'Nasi pecel pincuk', ket: 'Nasi, sayur rebus, kembang turi, sambal kacang, dan rempeyek. Dibungkus pincuk daun pisang.', harga: 10000, foto: f.pecel },
+          { id: 'pecel-pincuk', nama: 'Nasi pecel pincuk', ket: 'Nasi, sayur rebus, kembang turi, sambal kacang, dan rempeyek. Dibungkus pincuk daun pisang.', harga: 10000, foto: k.pecel },
           { id: 'pecel-telur', nama: 'Pecel + telur ceplok', ket: 'Nasi pecel lengkap dengan telur ceplok setengah matang.', harga: 13000, ilustrasi: 'nasi' },
-          { id: 'urap', nama: 'Urap daun kates', ket: 'Daun pepaya, kacang panjang, dan kelapa parut berbumbu. Pahitnya pas.', harga: 8000, foto: f.urap },
+          { id: 'urap', nama: 'Urap daun kates', ket: 'Daun pepaya, kacang panjang, dan kelapa parut berbumbu. Pahitnya pas.', harga: 8000, foto: k.urap },
         ],
       },
       {
         judul: 'Lauk tambahan',
         menu: [
-          { id: 'tempe', nama: 'Tempe goreng', ket: 'Dua potong, digoreng kering.', harga: 3000, foto: f.tempe },
-          { id: 'rempeyek', nama: 'Rempeyek kacang', ket: 'Satu bungkus isi lima keping.', harga: 5000, foto: f.rempeyek },
+          { id: 'tempe', nama: 'Tempe goreng', ket: 'Dua potong, digoreng kering.', harga: 3000, foto: k.tempe },
+          { id: 'rempeyek', nama: 'Rempeyek kacang', ket: 'Satu bungkus isi lima keping.', harga: 5000, foto: k.rempeyek },
           { id: 'tahu-pecel', nama: 'Tahu goreng', ket: 'Dua potong tahu putih goreng.', harga: 3000, ilustrasi: 'nasi' },
         ],
       },
@@ -146,9 +177,9 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Andalan',
         menu: [
-          { id: 'rawon', nama: 'Nasi rawon', ket: 'Daging sengkel, kuah keluak, telur asin separuh, tauge pendek, sambal terasi.', harga: 24000, foto: f.rawon },
-          { id: 'soto', nama: 'Soto ayam', ket: 'Kuah bening kunyit, suwiran ayam kampung, soun, seledri. Nasi dipisah.', harga: 17000, foto: f.soto },
-          { id: 'nasi-campur', nama: 'Nasi campur', ket: 'Nasi, sambal goreng ati, mi, perkedel, serundeng, dan kerupuk.', harga: 20000, foto: f.nasiCampur },
+          { id: 'rawon', nama: 'Nasi rawon', ket: 'Daging sengkel, kuah keluak, telur asin separuh, tauge pendek, sambal terasi.', harga: 24000, foto: k.rawon },
+          { id: 'soto', nama: 'Soto ayam', ket: 'Kuah bening kunyit, suwiran ayam kampung, soun, seledri. Nasi dipisah.', harga: 17000, foto: k.soto },
+          { id: 'nasi-campur', nama: 'Nasi campur', ket: 'Nasi, sambal goreng ati, mi, perkedel, serundeng, dan kerupuk.', harga: 20000, foto: k.nasiCampur },
         ],
       },
       {
@@ -156,7 +187,7 @@ export const WARUNG: Warung[] = [
         menu: [
           { id: 'telur-asin', nama: 'Telur asin', ket: 'Satu butir, dibelah dua.', harga: 5000, ilustrasi: 'nasi' },
           { id: 'empal', nama: 'Empal goreng', ket: 'Satu potong daging empal manis gurih.', harga: 9000, habis: true, ilustrasi: 'nasi' },
-          { id: 'es-jeruk-rawon', nama: 'Es jeruk', ket: 'Jeruk peras, gula secukupnya.', harga: 6000, foto: f.esJeruk },
+          { id: 'es-jeruk-rawon', nama: 'Es jeruk', ket: 'Jeruk peras, gula secukupnya.', harga: 6000, foto: k.esJeruk },
         ],
       },
     ],
@@ -178,18 +209,18 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Isi tenong',
         menu: [
-          { id: 'klepon', nama: 'Klepon', ket: 'Isi lima. Gula merah cair di dalam, kelapa parut di luar.', harga: 6000, foto: f.klepon },
-          { id: 'dadar', nama: 'Dadar gulung', ket: 'Dua gulung, isi unti kelapa gula jawa.', harga: 5000, foto: f.dadar },
-          { id: 'getuk', nama: 'Getuk lindri', ket: 'Singkong kukus warna-warni dengan kelapa parut.', harga: 5000, foto: f.getuk },
-          { id: 'onde', nama: 'Onde-onde', ket: 'Tiga buah, isi kacang hijau, berbalut wijen.', harga: 6000, foto: f.onde },
+          { id: 'klepon', nama: 'Klepon', ket: 'Isi lima. Gula merah cair di dalam, kelapa parut di luar.', harga: 6000, foto: k.klepon },
+          { id: 'dadar', nama: 'Dadar gulung', ket: 'Dua gulung, isi unti kelapa gula jawa.', harga: 5000, foto: k.dadar },
+          { id: 'getuk', nama: 'Getuk lindri', ket: 'Singkong kukus warna-warni dengan kelapa parut.', harga: 5000, foto: k.getuk },
+          { id: 'onde', nama: 'Onde-onde', ket: 'Tiga buah, isi kacang hijau, berbalut wijen.', harga: 6000, foto: k.onde },
           { id: 'lemper', nama: 'Lemper ayam', ket: 'Ketan gurih isi ayam suwir, dibungkus daun pisang.', harga: 4000, ilustrasi: 'lemper' },
         ],
       },
       {
         judul: 'Yang hangat',
         menu: [
-          { id: 'pisang', nama: 'Pisang goreng', ket: 'Pisang kepok, tepung tipis, empat potong.', harga: 6000, foto: f.pisang },
-          { id: 'kolak', nama: 'Kolak pisang ubi', ket: 'Kuah santan gula jawa, pisang, ubi, dan daun pandan. Satu cup.', harga: 7000, foto: f.kolak },
+          { id: 'pisang', nama: 'Pisang goreng', ket: 'Pisang kepok, tepung tipis, empat potong.', harga: 6000, foto: k.pisang },
+          { id: 'kolak', nama: 'Kolak pisang ubi', ket: 'Kuah santan gula jawa, pisang, ubi, dan daun pandan. Satu cup.', harga: 7000, foto: k.kolak },
         ],
       },
     ],
@@ -211,17 +242,17 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Andalan',
         menu: [
-          { id: 'bakso-urat', nama: 'Bakso urat', ket: 'Tiga bakso urat, dua bakso halus, tahu goreng, soun, kuah kaldu sapi.', harga: 17000, foto: f.bakso },
-          { id: 'mie-ayam', nama: 'Mie ayam', ket: 'Mie lebar, ayam kecap, sawi, kuah dipisah.', harga: 14000, foto: f.mieAyam },
+          { id: 'bakso-urat', nama: 'Bakso urat', ket: 'Tiga bakso urat, dua bakso halus, tahu goreng, soun, kuah kaldu sapi.', harga: 17000, foto: k.bakso },
+          { id: 'mie-ayam', nama: 'Mie ayam', ket: 'Mie lebar, ayam kecap, sawi, kuah dipisah.', harga: 14000, foto: k.mieAyam },
           { id: 'mie-ayam-bakso', nama: 'Mie ayam bakso', ket: 'Mie ayam dengan tambahan dua bakso halus.', harga: 18000, ilustrasi: 'mangkuk' },
         ],
       },
       {
         judul: 'Tambahan & minum',
         menu: [
-          { id: 'tahu-bakso', nama: 'Tahu goreng tepung', ket: 'Lima potong, cocol sambal.', harga: 6000, foto: f.tahu },
-          { id: 'es-jeruk', nama: 'Es jeruk', ket: 'Jeruk peras segar, es batu dibungkus terpisah.', harga: 6000, foto: f.esJeruk },
-          { id: 'es-teh-bakso', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: f.esTeh },
+          { id: 'tahu-bakso', nama: 'Tahu goreng tepung', ket: 'Lima potong, cocol sambal.', harga: 6000, foto: k.tahu },
+          { id: 'es-jeruk', nama: 'Es jeruk', ket: 'Jeruk peras segar, es batu dibungkus terpisah.', harga: 6000, foto: k.esJeruk },
+          { id: 'es-teh-bakso', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh },
         ],
       },
     ],
@@ -243,8 +274,8 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Andalan',
         menu: [
-          { id: 'geprek', nama: 'Ayam geprek + nasi', ket: 'Ayam goreng tepung digeprek dengan sambal korek. Level ditulis di catatan.', harga: 15000, foto: f.geprek },
-          { id: 'penyet', nama: 'Ayam penyet + nasi', ket: 'Ayam goreng bumbu kuning, sambal terasi, lalapan.', harga: 16000, foto: f.penyet },
+          { id: 'geprek', nama: 'Ayam geprek + nasi', ket: 'Ayam goreng tepung digeprek dengan sambal korek. Level ditulis di catatan.', harga: 15000, foto: k.geprek },
+          { id: 'penyet', nama: 'Ayam penyet + nasi', ket: 'Ayam goreng bumbu kuning, sambal terasi, lalapan.', harga: 16000, foto: k.penyet },
           { id: 'tahu-tempe-penyet', nama: 'Tahu tempe penyet', ket: 'Pilihan tanpa daging: tahu, tempe, sambal, lalapan, nasi.', harga: 10000, ilustrasi: 'nasi' },
         ],
       },
@@ -252,7 +283,7 @@ export const WARUNG: Warung[] = [
         judul: 'Tambahan & minum',
         menu: [
           { id: 'nasi-putih', nama: 'Nasi putih', ket: 'Satu porsi tambahan.', harga: 4000, ilustrasi: 'nasi' },
-          { id: 'es-teh-geprek', nama: 'Es teh manis', ket: 'Gelas besar, es batu dibungkus terpisah.', harga: 4000, foto: f.esTeh },
+          { id: 'es-teh-geprek', nama: 'Es teh manis', ket: 'Gelas besar, es batu dibungkus terpisah.', harga: 4000, foto: k.esTeh },
         ],
       },
     ],
@@ -274,15 +305,15 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Dari wajan',
         menu: [
-          { id: 'nasgor', nama: 'Nasi goreng Jawa', ket: 'Bumbu ulek, kecap, suwiran ayam, telur, acar, kerupuk.', harga: 16000, foto: f.nasiGoreng },
-          { id: 'mie-goreng', nama: 'Mie goreng', ket: 'Mie kuning, sawi, kol, telur, irisan tomat dan timun.', harga: 16000, foto: f.mieGoreng },
-          { id: 'mie-godhog', nama: 'Mie godhog', ket: 'Mie rebus kuah kental, telur bebek, sawi. Kuah dipisah.', harga: 16000, foto: f.mieRebus },
-          { id: 'sate-ayam', nama: 'Sate ayam (10 tusuk)', ket: 'Bumbu kacang, lontong dipisah.', harga: 20000, foto: f.sate },
+          { id: 'nasgor', nama: 'Nasi goreng Jawa', ket: 'Bumbu ulek, kecap, suwiran ayam, telur, acar, kerupuk.', harga: 16000, foto: k.nasiGoreng },
+          { id: 'mie-goreng', nama: 'Mie goreng', ket: 'Mie kuning, sawi, kol, telur, irisan tomat dan timun.', harga: 16000, foto: k.mieGoreng },
+          { id: 'mie-godhog', nama: 'Mie godhog', ket: 'Mie rebus kuah kental, telur bebek, sawi. Kuah dipisah.', harga: 16000, foto: k.mieRebus },
+          { id: 'sate-ayam', nama: 'Sate ayam (10 tusuk)', ket: 'Bumbu kacang, lontong dipisah.', harga: 20000, foto: k.sate },
         ],
       },
       {
         judul: 'Minum',
-        menu: [{ id: 'es-teh-nasgor', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: f.esTeh }],
+        menu: [{ id: 'es-teh-nasgor', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh }],
       },
     ],
   },
@@ -303,18 +334,18 @@ export const WARUNG: Warung[] = [
       {
         judul: 'Seduhan',
         menu: [
-          { id: 'kopi-tubruk', nama: 'Kopi hitam tubruk', ket: 'Robusta lereng Wilis, gula dipisah.', harga: 5000, foto: f.kopi },
-          { id: 'es-kopi-susu', nama: 'Es kopi susu', ket: 'Kopi tubruk, susu kental manis, es batu. Botol 250 ml.', harga: 10000, foto: f.esKopi },
-          { id: 'wedang-uwuh', nama: 'Wedang uwuh', ket: 'Rempah secang, jahe, cengkih, kayu manis. Disajikan panas.', harga: 7000, foto: f.uwuh },
-          { id: 'es-teh-kopi', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: f.esTeh },
+          { id: 'kopi-tubruk', nama: 'Kopi hitam tubruk', ket: 'Robusta lereng Wilis, gula dipisah.', harga: 5000, foto: k.kopi },
+          { id: 'es-kopi-susu', nama: 'Es kopi susu', ket: 'Kopi tubruk, susu kental manis, es batu. Botol 250 ml.', harga: 10000, foto: k.esKopi },
+          { id: 'wedang-uwuh', nama: 'Wedang uwuh', ket: 'Rempah secang, jahe, cengkih, kayu manis. Disajikan panas.', harga: 7000, foto: k.uwuh },
+          { id: 'es-teh-kopi', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh },
         ],
       },
       {
         judul: 'Teman ngopi',
         menu: [
           { id: 'nasi-bungkus', nama: 'Nasi bungkus sambal teri', ket: 'Nasi kepal, sambal teri, dibungkus kertas minyak.', harga: 4000, ilustrasi: 'bungkus' },
-          { id: 'pisang-kopi', nama: 'Pisang goreng', ket: 'Tiga potong, masih hangat.', harga: 5000, foto: f.pisang },
-          { id: 'tahu-kopi', nama: 'Tahu goreng tepung', ket: 'Lima potong.', harga: 6000, foto: f.tahu },
+          { id: 'pisang-kopi', nama: 'Pisang goreng', ket: 'Tiga potong, masih hangat.', harga: 5000, foto: k.pisang },
+          { id: 'tahu-kopi', nama: 'Tahu goreng tepung', ket: 'Lima potong.', harga: 6000, foto: k.tahu },
         ],
       },
     ],

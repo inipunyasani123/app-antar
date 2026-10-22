@@ -39,8 +39,10 @@ export default function Beranda() {
   const buka = now ? urut.filter((x) => x.st?.bisaPesan).sort((a, b) => a.m - b.m) : urut;
   const tutup = now ? urut.filter((x) => !x.st?.bisaPesan).sort((a, b) => a.m - b.m) : [];
 
-  const utama = KATEGORI.find((k) => k.id === sapa.utama)!;
-  const lain = KATEGORI.filter((k) => k.id !== sapa.utama);
+  // Ubin besar tetap (supaya gambar terbesar sudah ada di HTML statis); kategori yang pas dengan jam WIB diberi tanda setelah jam diketahui.
+  const utama = KATEGORI.find((k) => k.id === 'nasi')!;
+  const lain = KATEGORI.filter((k) => k.id !== 'nasi');
+  const pas = now ? sapa.utama : null;
   const jumlahDi = (id: KategoriId) => WARUNG.filter((w) => w.kategori.includes(id)).length;
 
   const berjalan = siap && now ? s.pesanan.find((p) => !p.contoh && !statusPesanan(p, now).selesai) : undefined;
@@ -102,15 +104,15 @@ export default function Beranda() {
           <SubJudul style={{ marginTop: 18, marginBottom: 10 }}>Mau yang mana?</SubJudul>
           <View style={gaya.bento}>
             <View style={{ flexDirection: 'row', gap: 10 }}>
-              <UbinKategori k={utama} besar jumlah={jumlahDi(utama.id)} />
+              <UbinKategori k={utama} besar jumlah={jumlahDi(utama.id)} pas={pas === utama.id} />
               <View style={{ flex: 1, gap: 10 }}>
-                <UbinKategori k={lain[0]} jumlah={jumlahDi(lain[0].id)} />
-                <UbinKategori k={lain[1]} jumlah={jumlahDi(lain[1].id)} />
+                <UbinKategori k={lain[0]} jumlah={jumlahDi(lain[0].id)} pas={pas === lain[0].id} />
+                <UbinKategori k={lain[1]} jumlah={jumlahDi(lain[1].id)} pas={pas === lain[1].id} />
               </View>
             </View>
             <View style={{ flexDirection: 'row', gap: 10 }}>
               {lain.slice(2).map((k) => (
-                <UbinKategori key={k.id} k={k} kecil jumlah={jumlahDi(k.id)} />
+                <UbinKategori key={k.id} k={k} kecil jumlah={jumlahDi(k.id)} pas={pas === k.id} />
               ))}
             </View>
             <Link href="/promo" asChild>
@@ -181,11 +183,16 @@ export default function Beranda() {
   );
 }
 
-function UbinKategori({ k, besar, kecil, jumlah }: { k: (typeof KATEGORI)[number]; besar?: boolean; kecil?: boolean; jumlah: number }) {
+function UbinKategori({ k, besar, kecil, jumlah, pas }: { k: (typeof KATEGORI)[number]; besar?: boolean; kecil?: boolean; jumlah: number; pas?: boolean }) {
   return (
     <Link href={`/kategori/${k.id}`} asChild>
       <Pressable style={StyleSheet.flatten([gaya.ubin, besar ? gaya.ubinBesar : kecil ? gaya.ubinKecil : gaya.ubinSedang])}>
-        <Foto sumber={k.foto} alt="" style={gaya.isiPenuh} />
+        <Foto sumber={k.foto} alt="" style={gaya.isiPenuh} prioritas={besar} />
+        {pas ? (
+          <View style={gaya.pas}>
+            <Text style={gaya.pasTeks}>Pas jam segini</Text>
+          </View>
+        ) : null}
         <View style={[gaya.ubinLabel, besar && { padding: 10 }]}>
           {besar ? (
             <Text style={gaya.ubinBesarTeks}>{k.nama}</Text>
@@ -221,6 +228,8 @@ const gaya = StyleSheet.create({
   ubinBesar: { flex: 1.15, height: 222 },
   ubinSedang: { height: 106 },
   ubinKecil: { flex: 1, height: 92 },
+  pas: { position: 'absolute', top: 8, left: 8, backgroundColor: warna.kunyit, borderRadius: radius.pil, paddingHorizontal: 9, paddingVertical: 3 },
+  pasTeks: { fontFamily: huruf.hitam, fontSize: 11.5, lineHeight: 16, color: warna.tinta },
   ubinLabel: { margin: 8, alignSelf: 'flex-start', backgroundColor: warna.putih, borderRadius: 12, paddingHorizontal: 9, paddingVertical: 5, maxWidth: '92%' },
   ubinTeks: { fontFamily: huruf.hitam, fontSize: 14, lineHeight: 18, color: warna.tinta },
   ubinBesarTeks: { fontFamily: huruf.display, fontSize: 21, lineHeight: 26, color: warna.sambalTua },

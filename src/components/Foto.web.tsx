@@ -16,7 +16,6 @@ export function Foto({ sumber, alt, style, prioritas }: Props) {
     height: s.height,
     loading: prioritas ? 'eager' : 'lazy',
     decoding: 'async',
-    fetchPriority: prioritas ? 'high' : undefined,
     draggable: false,
     style: [gaya.dasar, style],
   });
