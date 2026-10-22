@@ -1,17 +1,23 @@
 {
   "expo": {
-    "name": "antar",
-    "slug": "antar",
+    "name": "Pincuk",
+    "slug": "app-antar",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "pincuk",
     "userInterfaceStyle": "light",
+    "backgroundColor": "#FBF3E4",
+    "primaryColor": "#B3321B",
+    "description": "Demo aplikasi pesan-antar kuliner dari warung dan kedai lokal fiktif di Tirtalaya, Jawa Timur. Buatan PintuWeb.",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "id.pintuweb.demo.antar"
     },
     "android": {
+      "package": "id.pintuweb.demo.antar",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#B3321B",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -19,7 +25,33 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
-    }
+      "output": "static",
+      "bundler": "metro",
+      "favicon": "./assets/favicon.png",
+      "name": "Pincuk",
+      "shortName": "Pincuk",
+      "lang": "id",
+      "themeColor": "#B3321B",
+      "backgroundColor": "#FBF3E4"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://app-antar.pintuweb.id"
+        }
+      ],
+      "expo-status-bar",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#FBF3E4"
+        }
+      ]
+    ]
   }
 }

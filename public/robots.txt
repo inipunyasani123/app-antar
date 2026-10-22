@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /keranjang
+Disallow: /lacak
+Disallow: /chat
+Disallow: /alamat
+Disallow: /pesanan
+
+Sitemap: https://app-antar.pintuweb.id/sitemap.xml
