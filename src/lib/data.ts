@@ -105,13 +105,23 @@ const besar = new Map<unknown, ImageSourcePropType>((Object.keys(k) as (keyof ty
 /** Versi 640×480 dari foto kecil menu (untuk lembar detail). */
 export const versiBesar = (src: ImageSourcePropType) => besar.get(src) ?? src;
 
+/** Versi 400×300 khusus ubin bento kategori (lebih ringan untuk gambar terbesar di beranda). */
+const ubin = {
+  pecel: require('../../assets/images/menu/sedang/pecel.webp'),
+  geprek: require('../../assets/images/menu/sedang/ayam-geprek.webp'),
+  bakso: require('../../assets/images/menu/sedang/bakso.webp'),
+  urap: require('../../assets/images/menu/sedang/urap.webp'),
+  klepon: require('../../assets/images/menu/sedang/klepon.webp'),
+  esKopi: require('../../assets/images/menu/sedang/es-kopi-susu.webp'),
+};
+
 export const KATEGORI: Kategori[] = [
-  { id: 'sarapan', nama: 'Sarapan', sapaan: 'Sarapan pagi', ket: 'Pecel, nasi jagung, lontong lodeh, rawon, dan jajan pasar yang siap sejak subuh. Pesan dari warung pagi di Tirtalaya, diantar hangat.', foto: f.pecel },
-  { id: 'nasi', nama: 'Nasi & lauk', sapaan: 'Nasi & lauk', ket: 'Ayam geprek, nasi goreng, nasi campur, dan lauk rumahan dari warung tetangga. Pilih menu, cek ongkir, lalu pesan.', foto: f.geprek },
-  { id: 'kuah', nama: 'Bakso & berkuah', sapaan: 'Yang berkuah', ket: 'Bakso urat, mie ayam, rawon, dan soto ayam. Kuah dipisah supaya mie tidak lembek di jalan.', foto: f.bakso },
-  { id: 'pecel', nama: 'Pecel & sayur', sapaan: 'Pecel & sayur', ket: 'Pecel pincuk, urap, rujak cingur, dan sayur rumahan dengan sambal kacang atau petis dari warung Tirtalaya.', foto: f.urap },
-  { id: 'jajan', nama: 'Jajan pasar', sapaan: 'Jajan pasar', ket: 'Klepon, getuk, onde-onde, dan kolak dari tenong pagi dan sore, sampai terang bulan dan martabak telur untuk malam.', foto: f.klepon },
-  { id: 'minum', nama: 'Minuman', sapaan: 'Kopi & minuman', ket: 'Kopi tubruk, es dawet, es campur, wedang uwuh, dan wedang ronde. Warung kopinya buka 24 jam.', foto: f.esKopi },
+  { id: 'sarapan', nama: 'Sarapan', sapaan: 'Sarapan pagi', ket: 'Pecel, nasi jagung, lontong lodeh, rawon, dan jajan pasar yang siap sejak subuh. Pesan dari warung pagi di Tirtalaya, diantar hangat.', foto: ubin.pecel },
+  { id: 'nasi', nama: 'Nasi & lauk', sapaan: 'Nasi & lauk', ket: 'Ayam geprek, nasi goreng, nasi campur, dan lauk rumahan dari warung tetangga. Pilih menu, cek ongkir, lalu pesan.', foto: ubin.geprek },
+  { id: 'kuah', nama: 'Bakso & berkuah', sapaan: 'Yang berkuah', ket: 'Bakso urat, mie ayam, rawon, dan soto ayam. Kuah dipisah supaya mie tidak lembek di jalan.', foto: ubin.bakso },
+  { id: 'pecel', nama: 'Pecel & sayur', sapaan: 'Pecel & sayur', ket: 'Pecel pincuk, urap, rujak cingur, dan sayur rumahan dengan sambal kacang atau petis dari warung Tirtalaya.', foto: ubin.urap },
+  { id: 'jajan', nama: 'Jajan pasar', sapaan: 'Jajan pasar', ket: 'Klepon, getuk, onde-onde, dan kolak dari tenong pagi dan sore, sampai terang bulan dan martabak telur untuk malam.', foto: ubin.klepon },
+  { id: 'minum', nama: 'Minuman', sapaan: 'Kopi & minuman', ket: 'Kopi tubruk, es dawet, es campur, wedang uwuh, dan wedang ronde. Warung kopinya buka 24 jam.', foto: ubin.esKopi },
 ];
 
 export type Pilihan = { id: string; label: string; harga?: number };

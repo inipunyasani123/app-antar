@@ -227,7 +227,7 @@ function UbinKategori({ k, besar, kecil, jumlah, pas }: { k: (typeof KATEGORI)[n
   return (
     <Link href={`/kategori/${k.id}`} asChild>
       <Pressable style={StyleSheet.flatten([gaya.ubin, besar ? gaya.ubinBesar : kecil ? gaya.ubinKecil : gaya.ubinSedang])}>
-        <Foto sumber={k.foto} alt="" style={gaya.isiPenuh} prioritas={besar} />
+        <Foto sumber={k.foto} alt="" style={gaya.isiPenuh} prioritas={besar} utama={besar} />
         {pas ? (
           <View style={gaya.pas}>
             <Text style={gaya.pasTeks}>Pas jam segini</Text>

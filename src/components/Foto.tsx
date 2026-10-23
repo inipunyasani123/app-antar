@@ -1,6 +1,6 @@
 import { Image, type ImageSourcePropType, type ImageStyle, type StyleProp } from 'react-native';
 
-type Props = { sumber: ImageSourcePropType; alt: string; style?: StyleProp<ImageStyle>; prioritas?: boolean };
+type Props = { sumber: ImageSourcePropType; alt: string; style?: StyleProp<ImageStyle>; prioritas?: boolean; utama?: boolean };
 
 /** Android/iOS: Image bawaan React Native. */
 export function Foto({ sumber, alt, style }: Props) {

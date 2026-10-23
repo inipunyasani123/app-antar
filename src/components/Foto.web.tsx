@@ -1,13 +1,13 @@
 import { StyleSheet, type ImageSourcePropType, type ImageStyle, type StyleProp } from 'react-native';
 import { unstable_createElement } from 'react-native-web';
 
-type Props = { sumber: ImageSourcePropType; alt: string; style?: StyleProp<ImageStyle>; prioritas?: boolean };
+type Props = { sumber: ImageSourcePropType; alt: string; style?: StyleProp<ImageStyle>; prioritas?: boolean; utama?: boolean };
 
 /**
  * Web: <img> asli supaya foto ikut di HTML statis, dimuat malas (loading="lazy"),
  * dan punya ukuran intrinsik (tanpa pergeseran tata letak).
  */
-export function Foto({ sumber, alt, style, prioritas }: Props) {
+export function Foto({ sumber, alt, style, prioritas, utama }: Props) {
   const s = sumber as { uri: string; width?: number; height?: number };
   return unstable_createElement('img', {
     src: s.uri,
@@ -16,6 +16,7 @@ export function Foto({ sumber, alt, style, prioritas }: Props) {
     height: s.height,
     loading: prioritas ? 'eager' : 'lazy',
     decoding: 'async',
+    fetchPriority: utama ? 'high' : undefined,
     draggable: false,
     style: [gaya.dasar, style],
   });
