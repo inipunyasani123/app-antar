@@ -75,7 +75,7 @@ export function statusBuka(jadwal: Jadwal, ms: number): StatusBuka {
   const nanti = hariIni.find(([a]) => a > menit);
   if (nanti && hariIni.some(([, b]) => b <= menit)) return { buka: false, bisaPesan: false, jenis: 'istirahat', label: 'Istirahat', ket: `buka lagi ${jam(nanti[0])}` };
   if (nanti) return { buka: false, bisaPesan: false, jenis: 'belum', label: 'Belum buka', ket: `buka ${jam(nanti[0])}` };
-  return { buka: false, bisaPesan: false, jenis: 'tutup', label: 'Sudah tutup', ket: lagi };
+  return { buka: false, bisaPesan: false, jenis: 'tutup', label: 'Tutup', ket: lagi };
 }
 
 function bukaLagi(jadwal: Jadwal, hari: number, menit: number): string {
@@ -85,7 +85,6 @@ function bukaLagi(jadwal: Jadwal, hari: number, menit: number): string {
     for (const [a] of sesi) {
       if (i === 0 && a <= menit) continue;
       if (i === 0) return `buka lagi ${jam(a)}`;
-      if (i === 1) return `buka lagi besok (${HARI[h]}) ${jam(a)}`;
       return `buka lagi ${HARI[h]} ${jam(a)}`;
     }
   }

@@ -73,13 +73,13 @@ export default function Cari() {
         </View>
       </View>
       <Tenda warnaTenda={warna.daun} tinggi={12} />
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: 8 }} style={{ flexGrow: 0 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingHorizontal: 16, paddingVertical: 8 }} style={{ flexGrow: 0, flexShrink: 0 }}>
         <Chip label="Semua" aktif={!kat} aksen={warna.daun} onPress={() => setKat(null)} />
         {KATEGORI.map((k) => (
           <Chip key={k.id} label={k.nama} aktif={kat === k.id} aksen={warna.daun} onPress={() => setKat(kat === k.id ? null : k.id)} />
         ))}
       </ScrollView>
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 28 }} keyboardShouldPersistTaps="handled">
+      <ScrollView style={{ flex: 1 }} contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 28 }} keyboardShouldPersistTaps="handled">
         {!kata ? (
           <>
             <SubJudul style={gaya.judul}>Sering dicari</SubJudul>

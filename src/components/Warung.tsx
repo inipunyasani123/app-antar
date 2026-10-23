@@ -25,7 +25,7 @@ const warnaStatus = (s: StatusBuka) =>
   s.bisaPesan ? { bg: warna.daunMuda, fg: warna.daunTua } : s.buka || s.jenis === 'istirahat' || s.jenis === 'belum' ? { bg: warna.kunyitMuda, fg: warna.tinta } : { bg: warna.sambalMuda, fg: warna.sambalTua };
 
 /** Lencana status buka/tutup dengan alasan (libur, istirahat, belum buka). Sebelum jam diketahui tampil netral. */
-export function StatusWarung({ w, now, besar }: { w: Warung; now: number | null; besar?: boolean }) {
+export function StatusWarung({ w, now, besar, satuBaris }: { w: Warung; now: number | null; besar?: boolean; satuBaris?: boolean }) {
   if (!now) {
     return (
       <View style={[gaya.status, { backgroundColor: warna.kertas2 }]}>
@@ -39,7 +39,7 @@ export function StatusWarung({ w, now, besar }: { w: Warung; now: number | null;
   return (
     <View style={[gaya.status, { backgroundColor: c.bg }, besar && { paddingVertical: 6 }]}>
       <Ikon nama="jam" ukuran={14} warna={c.fg} />
-      <Text style={[gaya.statusTeks, { color: c.fg }]}>
+      <Text style={[gaya.statusTeks, { color: c.fg }]} numberOfLines={satuBaris ? 1 : undefined}>
         <Text style={{ fontFamily: huruf.hitam }}>{s.label}</Text> · {s.ket}
       </Text>
     </View>
@@ -103,9 +103,11 @@ export function KartuWarungRingkas({ w, now }: { w: Warung; now: number | null }
           <Text style={gaya.ringkasMeta} numberOfLines={1}>
             ±{info.menit} mnt · {km(info.meter)} · {info.terjangkau ? `ongkir ${rupiah(info.ongkir)}` : 'di luar jangkauan'}
           </Text>
-          <View style={[gaya.baris, { marginTop: 4, justifyContent: 'space-between' }]}>
-            <StatusWarung w={w} now={now} />
-            <Text style={gaya.mulai}>mulai {rupiah(hargaMulai(w))}</Text>
+          <Text style={gaya.mulai} numberOfLines={1}>
+            mulai {rupiah(hargaMulai(w))}
+          </Text>
+          <View style={{ marginTop: 4 }}>
+            <StatusWarung w={w} now={now} satuBaris />
           </View>
         </View>
       </Pressable>
