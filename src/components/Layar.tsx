@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Platform, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { huruf, warna } from '@/lib/theme';
+import { Tenda, UratDaun } from './Motif';
 import { Judul, TombolIkon } from './ui';
 
 type Props = {
@@ -28,16 +29,20 @@ export function Layar({ judul, kembali, kanan, bawah, children, gulir = true, is
   return (
     <View style={[gaya.akar, { backgroundColor: latar }]} role="main">
       {!tanpaKepala ? (
-        <View style={[gaya.kepala, { paddingTop: ins.top + 8 }]}>
-          {kembali ? <TombolIkon ikon="kembali" label="Kembali" onPress={() => kembaliKe(typeof kembali === 'string' ? kembali : '/')} /> : null}
-          {judul ? (
-            <Judul level={1} ukuran={22} style={{ flex: 1 }} numberOfLines={1}>
-              {judul}
-            </Judul>
-          ) : (
-            <View style={{ flex: 1 }} />
-          )}
-          {kanan}
+        <View>
+          <View style={[gaya.kepala, { paddingTop: ins.top + 8 }]}>
+            <UratDaun />
+            {kembali ? <TombolIkon ikon="kembali" label="Kembali" latar={warna.kertas} onPress={() => kembaliKe(typeof kembali === 'string' ? kembali : '/')} /> : null}
+            {judul ? (
+              <Judul level={1} ukuran={22} warna={warna.kertas} style={{ flex: 1 }} numberOfLines={1}>
+                {judul}
+              </Judul>
+            ) : (
+              <View style={{ flex: 1 }} />
+            )}
+            {kanan}
+          </View>
+          <Tenda warnaTenda={warna.daun} tinggi={12} />
         </View>
       ) : null}
       {gulir ? (
@@ -54,8 +59,8 @@ export function Layar({ judul, kembali, kanan, bawah, children, gulir = true, is
 
 const gaya = StyleSheet.create({
   akar: { flex: 1 },
-  kepala: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingBottom: 10 },
-  isi: { paddingHorizontal: 16, paddingBottom: 32 },
+  kepala: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingBottom: 10, backgroundColor: warna.daun, overflow: 'hidden' },
+  isi: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 32 },
   bawah: {
     paddingHorizontal: 16,
     paddingTop: 12,

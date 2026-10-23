@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import { Pressable, View, type GestureResponderEvent, type StyleProp, type ViewStyle } from 'react-native';
+import { View, type GestureResponderEvent, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Defs, G, Line, Path, Pattern, Rect, Text as SvgText } from 'react-native-svg';
 import { JALAN_X, JALAN_Y, NAMA_JALAN, PETA, posisiDiRute, type Titik } from '@/lib/peta';
 import { huruf, warna } from '@/lib/theme';
@@ -16,12 +16,14 @@ type Props = {
   rumah?: (Titik & { label?: string }) | null;
   onPilih?: (t: Titik) => void;
   style?: StyleProp<ViewStyle>;
+  tinggi?: number; // pratinjau tipis: tinggi tetap, peta dipotong di tengah
+  mini?: boolean; // tanpa label nama tempat & jalan
 };
 
 const fontLabel = huruf.tebal as string;
 
 /** Peta ILUSTRASI Kota Tirtalaya (bukan ubin peta sungguhan). */
-export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, rumah, onPilih, style }: Props) {
+export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, rumah, onPilih, style, tinggi, mini }: Props) {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, '');
   const [lebar, setLebar] = useState(0);
   const skala = lebar ? PETA.lebar / lebar : 1;
@@ -50,7 +52,7 @@ export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, ruma
   }
 
   const isi = (
-    <Svg width="100%" height="100%" viewBox={`0 0 ${PETA.lebar} ${PETA.tinggi}`} aria-hidden focusable={false}>
+    <Svg width="100%" height="100%" viewBox={`0 0 ${PETA.lebar} ${PETA.tinggi}`} preserveAspectRatio={tinggi ? 'xMidYMid slice' : 'xMidYMid meet'} aria-hidden focusable={false}>
       <Defs>
         <Pattern id={`sawah${id}`} width={8} height={8} patternUnits="userSpaceOnUse" patternTransform="rotate(90)">
           <Rect width={8} height={8} fill={warna.sawah} />
@@ -112,7 +114,8 @@ export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, ruma
         <Line key={`jx${x}`} x1={x} y1={JALAN_Y[0] - 12} x2={x} y2={JALAN_Y[JALAN_Y.length - 1] + 12} stroke={warna.jalan} strokeWidth={8.5} strokeLinecap="round" />
       ))}
 
-      {/* nama tempat */}
+      {!mini ? (
+        <G>
       <SvgText x={196} y={154} fontSize={8} fontFamily={fontLabel} fill={warna.tinta2} textAnchor="middle">
         Alun-alun
       </SvgText>
@@ -130,6 +133,9 @@ export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, ruma
           {NAMA_JALAN.y[i]}
         </SvgText>
       ))}
+
+        </G>
+      ) : null}
 
       {/* rute */}
       {d ? <Path d={d} stroke={warna.sambal} strokeWidth={4} fill="none" strokeDasharray="7 6" strokeLinecap="round" strokeLinejoin="round" /> : null}
@@ -177,11 +183,11 @@ export function Peta({ label, rute, progres = 0, kurir, warung, warungLain, ruma
   );
 
   return (
-    <View style={[{ width: '100%', aspectRatio: PETA.lebar / PETA.tinggi, backgroundColor: '#F1E4C8', overflow: 'hidden' }, style]} onLayout={(e) => setLebar(e.nativeEvent.layout.width)}>
+    <View style={[{ width: '100%', backgroundColor: '#F1E4C8', overflow: 'hidden' }, tinggi ? { height: tinggi } : { aspectRatio: PETA.lebar / PETA.tinggi }, style]} onLayout={(e) => setLebar(e.nativeEvent.layout.width)}>
       {onPilih ? (
-        <Pressable onPress={ketuk} role="img" aria-label={label} style={{ flex: 1 }} focusable={false}>
+        <View role="img" aria-label={label} style={{ flex: 1 }} onStartShouldSetResponder={() => true} onResponderRelease={ketuk}>
           {isi}
-        </Pressable>
+        </View>
       ) : (
         <View role="img" aria-label={label} style={{ flex: 1 }}>
           {isi}

@@ -1,7 +1,7 @@
 import Svg, { Circle, Ellipse, Path, Rect } from 'react-native-svg';
 import { warna } from '@/lib/theme';
 
-export type JenisIlustrasi = 'lemper' | 'nasi' | 'gelas' | 'mangkuk' | 'bungkus';
+export type JenisIlustrasi = 'lemper' | 'nasi' | 'gelas' | 'mangkuk' | 'bungkus' | 'rujak' | 'ronde' | 'angsle' | 'penyet' | 'empal';
 
 /** Ilustrasi buatan sendiri untuk menu yang tidak punya foto CC0 yang cocok. */
 export function IlustrasiMenu({ jenis, ukuran = 72, radius = 14 }: { jenis: JenisIlustrasi; ukuran?: number; radius?: number }) {
@@ -49,6 +49,61 @@ function gambar(j: JenisIlustrasi) {
           <Path d="M16 50h40l-4 4H20z" fill="#9E6B4F" />
           <Path d="M26 38l20 0" stroke={warna.kertas} strokeWidth={2.4} strokeLinecap="round" />
           <Circle cx={36} cy={32} r={2.4} fill={warna.sambal} />
+        </>
+      );
+    case 'rujak':
+      return (
+        <>
+          <Ellipse cx={36} cy={50} rx={27} ry={8} fill={warna.putih} stroke={warna.garisTegas} strokeWidth={1.5} />
+          <Path d="M14 46c4-10 40-10 44 0-6 6-38 6-44 0z" fill="#4A2E1F" />
+          <Rect x={22} y={38} width={8} height={7} rx={1.5} fill="#FFFDF8" />
+          <Rect x={33} y={36} width={8} height={7} rx={1.5} fill="#E9C27A" />
+          <Rect x={44} y={39} width={7} height={6} rx={1.5} fill="#FFFDF8" />
+          <Path d="M28 33c3-4 8-4 10 0M40 32c2-3 6-3 8 1" stroke={warna.daun} strokeWidth={2.4} strokeLinecap="round" fill="none" />
+          <Circle cx={30} cy={47} r={1.6} fill={warna.sambal} />
+        </>
+      );
+    case 'ronde':
+      return (
+        <>
+          <Path d="M14 34h44c0 13-10 21-22 21S14 47 14 34z" fill={warna.putih} stroke={warna.garisTegas} strokeWidth={1.5} />
+          <Ellipse cx={36} cy={34} rx={22} ry={4.5} fill="#C9853E" />
+          <Circle cx={28} cy={33} r={4} fill="#F4D7DA" />
+          <Circle cx={37} cy={32} r={4} fill="#FFFDF8" />
+          <Circle cx={45} cy={34} r={3.6} fill="#CFE3B8" />
+          <Path d="M28 22c-2 2 2 3 0 5M38 20c-2 2 2 3 0 5M46 23c-2 2 2 3 0 5" stroke={warna.tinta2} strokeWidth={1.6} strokeLinecap="round" fill="none" />
+        </>
+      );
+    case 'angsle':
+      return (
+        <>
+          <Path d="M14 34h44c0 13-10 21-22 21S14 47 14 34z" fill={warna.putih} stroke={warna.garisTegas} strokeWidth={1.5} />
+          <Ellipse cx={36} cy={34} rx={22} ry={4.5} fill="#F6EEDC" />
+          <Rect x={25} y={30} width={6} height={5} rx={1} fill="#E3C79C" />
+          <Rect x={39} y={29} width={6} height={5} rx={1} fill="#E3C79C" />
+          <Path d="M31 33c2-2 5-2 7 0" stroke="#D8708A" strokeWidth={2.2} strokeLinecap="round" fill="none" />
+          <Circle cx={47} cy={34} r={1.6} fill="#7FA36A" />
+          <Circle cx={23} cy={35} r={1.6} fill="#7FA36A" />
+        </>
+      );
+    case 'penyet':
+      return (
+        <>
+          <Ellipse cx={36} cy={50} rx={26} ry={8} fill="#8A7360" />
+          <Ellipse cx={36} cy={47} rx={24} ry={7} fill="#A88B72" />
+          <Rect x={20} y={38} width={13} height={9} rx={2} fill="#E3C79C" transform="rotate(-8 26 42)" />
+          <Rect x={36} y={39} width={14} height={8} rx={2} fill="#C98F4E" transform="rotate(6 43 43)" />
+          <Path d="M24 44c4 3 20 3 26-1" stroke={warna.sambal} strokeWidth={3.4} strokeLinecap="round" fill="none" />
+          <Path d="M52 34l6-6M50 32l4-7" stroke={warna.daun} strokeWidth={2.2} strokeLinecap="round" />
+        </>
+      );
+    case 'empal':
+      return (
+        <>
+          <Ellipse cx={36} cy={50} rx={26} ry={7} fill={warna.putih} stroke={warna.garisTegas} strokeWidth={1.5} />
+          <Path d="M18 44c2-9 12-12 20-11 9 1 16 5 16 11-8 4-28 5-36 0z" fill="#7A4A2E" />
+          <Path d="M24 40l20 1M26 44l22 0" stroke="#A86A43" strokeWidth={1.6} strokeLinecap="round" />
+          <Path d="M50 36c3-2 6-1 7 2" stroke={warna.daun} strokeWidth={2.2} strokeLinecap="round" fill="none" />
         </>
       );
     default:

@@ -1,7 +1,9 @@
 import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Kosong } from '@/components/Kosong';
 import { AvatarKurir } from '@/components/Kurir';
+import { UratDaun } from '@/components/Motif';
 import { Layar } from '@/components/Layar';
 import { Chip, TombolIkon } from '@/components/ui';
 import { kurirPesanan, pesanOtomatis, statusPesanan, TAHAP } from '@/lib/pesanan';
@@ -15,7 +17,7 @@ export function generateMetadata() {
   return meta({ judul: 'Chat Kurir', deskripsi: 'Chat simulasi dengan kurir di demo Pincuk: pesan otomatis per tahap pengantaran dan balasan singkat untuk patokan, kembalian, atau posisi.', path: '/chat', noindex: true });
 }
 
-const CEPAT = ['Pagar hijau, depan musala', 'Tolong bawa kembalian', 'Sudah sampai mana?', 'Sambalnya dipisah, ya', 'Terima kasih'];
+const CEPAT = ['Pagar hijau ya, Mas', 'Titip di pos ronda saja', 'Kembaliannya pas', 'Sudah sampai mana?', 'Sambalnya dipisah, ya', 'Matur nuwun'];
 
 export default function Chat() {
   useJudulDokumen(judulHalaman('Chat Kurir'));
@@ -41,7 +43,7 @@ export default function Chat() {
   if (!p) {
     return (
       <Layar judul="Chat kurir" kembali="/pesanan">
-        <Text style={gaya.kecil}>Chat hanya tersedia untuk pesanan yang tersimpan di perangkat ini.</Text>
+        <Kosong jenis="chat" judul="Belum ada kurir untuk diajak chat" teks="Chat terbuka begitu pesananmu mulai dimasak dan kurir dipilih. Pesanan demo hanya tersimpan di perangkat ini." aksi="Lihat pesanan" href="/pesanan" />
       </Layar>
     );
   }
@@ -91,8 +93,10 @@ export default function Chat() {
         </Text>
         <Text style={gaya.kecil}>Chat simulasi: kurir menjawab otomatis dengan kalimat sederhana.</Text>
       </View>
+      <View style={{ flex: 1 }}>
+      <UratDaun warnaGaris="rgba(46,107,59,0.06)" />
       <ScrollView ref={gulir} style={{ flex: 1 }} contentContainerStyle={{ padding: 16, gap: 10 }} role="log" aria-label="Percakapan dengan kurir" aria-live="polite">
-        {daftar.length === 0 ? <Text style={[gaya.kecil, { textAlign: 'center', marginTop: 20 }]}>Kurir akan menyapa begitu pesanan mulai dimasak.</Text> : null}
+        {daftar.length === 0 ? <Kosong jenis="chat" judul="Kurir belum menyapa" teks="Kurir akan menyapa begitu pesanan mulai dimasak. Kamu boleh menulis patokan rumah dulu." /> : null}
         {daftar.map((m) => (
           <View key={m.id + m.waktu} style={[gaya.gelembung, m.dari === 'kamu' ? gaya.kamu : gaya.kurir]}>
             <Text style={[gaya.pesan, m.dari === 'kamu' && { color: '#FFFFFF' }]}>{m.teks}</Text>
@@ -102,6 +106,7 @@ export default function Chat() {
           </View>
         ))}
       </ScrollView>
+      </View>
     </Layar>
   );
 }

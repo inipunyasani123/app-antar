@@ -1,16 +1,21 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
-import { cariMenu, KURIR, warungById } from './data';
+import { cariMenu, hargaSatuan, kunciItem, KURIR, pilihanAwal, ringkasPilihan, warungById, type PilihanMenu } from './data';
 import { cekPromo, menitJalan, ongkir } from './harga';
 import { rute } from './peta';
-import { balasanKurir, kodePesanan, lompatanKeTahapBerikut, statusPesanan, type PesanChat, type Pesanan } from './pesanan';
+import { balasanKurir, kodePesanan, lompatanKeTahapBerikut, statusPesanan, type Penilaian, type PesanChat, type Pesanan } from './pesanan';
 
 export type Alamat = { id: string; label: string; detail: string; patokan: string; x: number; y: number };
-export type ItemKeranjang = { menuId: string; qty: number };
+export type ItemKeranjang = { kunci: string; menuId: string; qty: number; pilih: PilihanMenu; catatan: string };
 export type Keranjang = { warungId: string | null; item: ItemKeranjang[]; catatan: string };
 
 export type State = {
-  versi: 1;
+  versi: 2;
+  favorit: string[];
+  cariTerakhir: string[];
+  dilihat: string[];
+  kenalan: boolean; // pengantar sudah dilihat
+  penilaian: Record<string, Penilaian>;
   alamat: Alamat[];
   alamatAktif: string;
   keranjang: Keranjang;
@@ -20,7 +25,7 @@ export type State = {
   chat: Record<string, PesanChat[]>;
 };
 
-const KUNCI = 'pincuk.demo.v1';
+const KUNCI = 'pincuk.demo.v1'; // kunci tetap; isi dimigrasi dari versi 1
 
 const ALAMAT_AWAL: Alamat[] = [
   { id: 'rumah', label: 'Rumah', detail: 'Jl. Kenanga Gg. 3 No. 12, Kepatihan', patokan: 'pagar hijau, depan musala', x: 40, y: 125 },
@@ -30,7 +35,12 @@ const ALAMAT_AWAL: Alamat[] = [
 const KERANJANG_KOSONG: Keranjang = { warungId: null, item: [], catatan: '' };
 
 export const STATE_AWAL: State = {
-  versi: 1,
+  versi: 2,
+  favorit: [],
+  cariTerakhir: [],
+  dilihat: [],
+  kenalan: false,
+  penilaian: {},
   alamat: ALAMAT_AWAL,
   alamatAktif: 'rumah',
   keranjang: KERANJANG_KOSONG,
@@ -51,7 +61,8 @@ function riwayatContoh(now: number): Pesanan[] {
     const dibuat = awalHariWib - mundur * hari + menitWib * 60000;
     const item = menu.map(([id, qty]) => {
       const m = cariMenu(warungId, id)!;
-      return { menuId: id, nama: m.nama, harga: m.harga, qty };
+      const pilih = pilihanAwal(m);
+      return { menuId: id, nama: m.nama, harga: hargaSatuan(m, pilih), qty, pilih, opsiTeks: ringkasPilihan(m, pilih) };
     });
     const subtotal = item.reduce((s, i) => s + i.harga * i.qty, 0);
     const ok = ongkir(r.meter);
@@ -87,8 +98,9 @@ function riwayatContoh(now: number): Pesanan[] {
 
 type Aksi =
   | { t: 'muat'; state: State }
-  | { t: 'tambah'; warungId: string; menuId: string; ganti?: boolean }
-  | { t: 'qty'; menuId: string; delta: number }
+  | { t: 'tambah'; warungId: string; item: ItemKeranjang; ganti?: boolean }
+  | { t: 'qty'; kunci: string; delta: number }
+  | { t: 'kembalikan'; item: ItemKeranjang; indeks: number }
   | { t: 'catatan'; teks: string }
   | { t: 'kosongkan' }
   | { t: 'alamatAktif'; id: string }
@@ -100,6 +112,11 @@ type Aksi =
   | { t: 'ubahPesanan'; id: string; ubah: Partial<Pesanan> }
   | { t: 'chat'; id: string; pesan: PesanChat[] }
   | { t: 'isiKeranjang'; keranjang: Keranjang }
+  | { t: 'favorit'; id: string }
+  | { t: 'cari'; q: string | null }
+  | { t: 'lihat'; id: string }
+  | { t: 'kenalan'; sudah: boolean }
+  | { t: 'nilai'; id: string; nilai: Penilaian }
   | { t: 'reset'; state: State };
 
 function reducer(s: State, a: Aksi): State {
@@ -109,13 +126,18 @@ function reducer(s: State, a: Aksi): State {
       return a.state;
     case 'tambah': {
       const k = a.ganti || s.keranjang.warungId !== a.warungId ? { warungId: a.warungId, item: [], catatan: '' } : s.keranjang;
-      const ada = k.item.find((i) => i.menuId === a.menuId);
-      const item = ada ? k.item.map((i) => (i.menuId === a.menuId ? { ...i, qty: Math.min(20, i.qty + 1) } : i)) : [...k.item, { menuId: a.menuId, qty: 1 }];
+      const ada = k.item.find((i) => i.kunci === a.item.kunci);
+      const item = ada ? k.item.map((i) => (i.kunci === a.item.kunci ? { ...i, qty: Math.min(20, i.qty + a.item.qty) } : i)) : [...k.item, a.item];
       return { ...s, keranjang: { ...k, item }, promo: a.ganti ? null : s.promo };
     }
     case 'qty': {
-      const item = s.keranjang.item.map((i) => (i.menuId === a.menuId ? { ...i, qty: Math.min(20, i.qty + a.delta) } : i)).filter((i) => i.qty > 0);
-      return { ...s, keranjang: item.length ? { ...s.keranjang, item } : KERANJANG_KOSONG };
+      const item = s.keranjang.item.map((i) => (i.kunci === a.kunci ? { ...i, qty: Math.min(20, i.qty + a.delta) } : i)).filter((i) => i.qty > 0);
+      return { ...s, keranjang: item.length ? { ...s.keranjang, item } : { ...s.keranjang, item: [] } };
+    }
+    case 'kembalikan': {
+      const item = [...s.keranjang.item];
+      item.splice(Math.min(a.indeks, item.length), 0, a.item);
+      return { ...s, keranjang: { ...s.keranjang, item } };
     }
     case 'catatan':
       return { ...s, keranjang: { ...s.keranjang, catatan: a.teks.slice(0, 160) } };
@@ -145,12 +167,31 @@ function reducer(s: State, a: Aksi): State {
       return { ...s, chat: { ...s.chat, [a.id]: [...(s.chat[a.id] ?? []), ...a.pesan] } };
     case 'isiKeranjang':
       return { ...s, keranjang: a.keranjang, promo: null };
+    case 'favorit':
+      return { ...s, favorit: s.favorit.includes(a.id) ? s.favorit.filter((x) => x !== a.id) : [a.id, ...s.favorit] };
+    case 'cari':
+      if (a.q === null) return { ...s, cariTerakhir: [] };
+      return { ...s, cariTerakhir: [a.q, ...s.cariTerakhir.filter((x) => x.toLowerCase() !== a.q!.toLowerCase())].slice(0, 5) };
+    case 'lihat':
+      if (s.dilihat[0] === a.id) return s;
+      return { ...s, dilihat: [a.id, ...s.dilihat.filter((x) => x !== a.id)].slice(0, 6) };
+    case 'kenalan':
+      return s.kenalan === a.sudah ? s : { ...s, kenalan: a.sudah };
+    case 'nilai':
+      return { ...s, penilaian: { ...s.penilaian, [a.id]: a.nilai } };
   }
 }
 
-function sah(x: unknown): x is State {
-  const s = x as State;
-  return !!s && s.versi === 1 && Array.isArray(s.alamat) && Array.isArray(s.pesanan) && !!s.keranjang;
+/** Migrasi data tersimpan versi 1 (keranjang tanpa pilihan menu). */
+function migrasi(x: unknown): State | null {
+  const s = x as State & { versi: number };
+  if (!s || !Array.isArray(s.alamat) || !Array.isArray(s.pesanan) || !s.keranjang) return null;
+  if (s.versi === 2) return s;
+  if (s.versi === 1) {
+    const item = (s.keranjang.item as unknown as { menuId: string; qty: number }[]).map((i) => ({ kunci: kunciItem(i.menuId, {}), menuId: i.menuId, qty: i.qty, pilih: {}, catatan: '' }));
+    return { ...STATE_AWAL, ...s, versi: 2, keranjang: { ...s.keranjang, item } };
+  }
+  return null;
 }
 
 type Nilai = {
@@ -158,8 +199,14 @@ type Nilai = {
   siap: boolean;
   alamat: Alamat;
   jumlahItem: number;
-  tambah: (warungId: string, menuId: string, ganti?: boolean) => 'ok' | 'beda-warung';
-  qty: (menuId: string, delta: number) => void;
+  tambah: (warungId: string, menuId: string, opsi?: { pilih?: PilihanMenu; qty?: number; catatan?: string; ganti?: boolean }) => 'ok' | 'beda-warung';
+  qty: (kunci: string, delta: number) => void;
+  kembalikan: (item: ItemKeranjang, indeks: number) => void;
+  toggleFavorit: (id: string) => void;
+  simpanCari: (q: string | null) => void;
+  lihatWarung: (id: string) => void;
+  setKenalan: (sudah: boolean) => void;
+  nilai: (id: string, n: Penilaian) => void;
   catatan: (teks: string) => void;
   kosongkan: () => void;
   pilihAlamat: (id: string) => void;
@@ -192,7 +239,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       try {
         const raw = await AsyncStorage.getItem(KUNCI);
         const x = raw ? JSON.parse(raw) : null;
-        if (sah(x)) muat = x;
+        muat = migrasi(x);
       } catch {
         /* penyimpanan diblokir: jalan dengan data awal */
       }
@@ -216,10 +263,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const alamat = s.alamat.find((a) => a.id === s.alamatAktif) ?? s.alamat[0];
   const jumlahItem = s.keranjang.item.reduce((n, i) => n + i.qty, 0);
 
-  const tambah = useCallback((warungId: string, menuId: string, ganti?: boolean) => {
+  const tambah = useCallback((warungId: string, menuId: string, opsi?: { pilih?: PilihanMenu; qty?: number; catatan?: string; ganti?: boolean }) => {
     const k = sRef.current.keranjang;
-    if (!ganti && k.warungId && k.warungId !== warungId && k.item.length) return 'beda-warung' as const;
-    dispatch({ t: 'tambah', warungId, menuId, ganti });
+    if (!opsi?.ganti && k.warungId && k.warungId !== warungId && k.item.length) return 'beda-warung' as const;
+    const m = cariMenu(warungId, menuId);
+    if (!m) return 'ok' as const;
+    const pilih = opsi?.pilih ?? pilihanAwal(m);
+    const catatan = (opsi?.catatan ?? '').trim().slice(0, 80);
+    dispatch({ t: 'tambah', warungId, ganti: opsi?.ganti, item: { kunci: kunciItem(menuId, pilih, catatan), menuId, qty: opsi?.qty ?? 1, pilih, catatan } });
     return 'ok' as const;
   }, []);
 
@@ -231,7 +282,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!w || !k.item.length || !a) return null;
     const item = k.item.map((i) => {
       const m = cariMenu(w.id, i.menuId)!;
-      return { menuId: i.menuId, nama: m.nama, harga: m.harga, qty: i.qty };
+      return { menuId: i.menuId, nama: m.nama, harga: hargaSatuan(m, i.pilih), qty: i.qty, pilih: i.pilih, opsiTeks: ringkasPilihan(m, i.pilih), catatan: i.catatan || undefined };
     });
     const subtotal = item.reduce((n, i) => n + i.harga * i.qty, 0);
     const r = rute({ x: w.x, y: w.y }, a);
@@ -279,37 +330,53 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const nilai = useMemo<Nilai>(
+  // Aksi sederhana dibuat sekali (stabil), supaya aman dipakai sebagai dependensi efek di layar.
+  const aksi = useMemo(
     () => ({
-      s,
-      siap,
-      alamat,
-      jumlahItem,
-      tambah,
-      qty: (menuId, delta) => dispatch({ t: 'qty', menuId, delta }),
-      catatan: (teks) => dispatch({ t: 'catatan', teks }),
+      qty: (kunci: string, delta: number) => dispatch({ t: 'qty', kunci, delta }),
+      kembalikan: (item: ItemKeranjang, indeks: number) => dispatch({ t: 'kembalikan', item, indeks }),
+      toggleFavorit: (id: string) => dispatch({ t: 'favorit', id }),
+      simpanCari: (q: string | null) => dispatch({ t: 'cari', q }),
+      lihatWarung: (id: string) => dispatch({ t: 'lihat', id }),
+      setKenalan: (sudah: boolean) => dispatch({ t: 'kenalan', sudah }),
+      nilai: (id: string, n: Penilaian) => dispatch({ t: 'nilai', id, nilai: n }),
+      catatan: (teks: string) => dispatch({ t: 'catatan', teks }),
       kosongkan: () => dispatch({ t: 'kosongkan' }),
-      pilihAlamat: (id) => dispatch({ t: 'alamatAktif', id }),
-      simpanAlamat: (al) => dispatch({ t: 'simpanAlamat', alamat: al }),
-      hapusAlamat: (id) => dispatch({ t: 'hapusAlamat', id }),
-      pakaiPromo: (kode) => dispatch({ t: 'promo', kode }),
-      pilihBayar: (m) => dispatch({ t: 'bayar', metode: m }),
-      buatPesanan,
-      bayarQris: (id, now) => dispatch({ t: 'ubahPesanan', id, ubah: { dibayar: now } }),
-      batalkan: (id, now) => dispatch({ t: 'ubahPesanan', id, ubah: { batal: now } }),
-      percepat: (id, now) => {
+      pilihAlamat: (id: string) => dispatch({ t: 'alamatAktif', id }),
+      simpanAlamat: (al: Alamat) => dispatch({ t: 'simpanAlamat', alamat: al }),
+      hapusAlamat: (id: string) => dispatch({ t: 'hapusAlamat', id }),
+      pakaiPromo: (kode: string | null) => dispatch({ t: 'promo', kode }),
+      pilihBayar: (m: 'tunai' | 'qris') => dispatch({ t: 'bayar', metode: m }),
+      bayarQris: (id: string, now: number) => dispatch({ t: 'ubahPesanan', id, ubah: { dibayar: now } }),
+      batalkan: (id: string, now: number) => dispatch({ t: 'ubahPesanan', id, ubah: { batal: now } }),
+      percepat: (id: string, now: number) => {
         const p = sRef.current.pesanan.find((x) => x.id === id);
         if (p) dispatch({ t: 'ubahPesanan', id, ubah: { lompat: lompatanKeTahapBerikut(p, now) } });
       },
-      kirimChat,
-      pesanLagi: (p) => dispatch({ t: 'isiKeranjang', keranjang: { warungId: p.warungId, item: p.item.filter((i) => cariMenu(p.warungId, i.menuId) && !cariMenu(p.warungId, i.menuId)!.habis).map((i) => ({ menuId: i.menuId, qty: i.qty })), catatan: p.catatan } }),
+      pesanLagi: (p: Pesanan) =>
+        dispatch({
+          t: 'isiKeranjang',
+          keranjang: {
+            warungId: p.warungId,
+            item: p.item
+              .filter((i) => cariMenu(p.warungId, i.menuId) && !cariMenu(p.warungId, i.menuId)!.habis)
+              .map((i) => {
+                const m = cariMenu(p.warungId, i.menuId)!;
+                const pilih = i.pilih ?? pilihanAwal(m);
+                return { kunci: kunciItem(i.menuId, pilih, i.catatan ?? ''), menuId: i.menuId, qty: i.qty, pilih, catatan: i.catatan ?? '' };
+              }),
+            catatan: p.catatan,
+          },
+        }),
       resetDemo: () => {
         AsyncStorage.removeItem(KUNCI).catch(() => {});
-        dispatch({ t: 'reset', state: { ...STATE_AWAL, pesanan: riwayatContoh(Date.now()) } });
+        dispatch({ t: 'reset', state: { ...STATE_AWAL, kenalan: true, pesanan: riwayatContoh(Date.now()) } });
       },
     }),
-    [s, siap, alamat, jumlahItem, tambah, buatPesanan, kirimChat],
+    [],
   );
+
+  const nilai = useMemo<Nilai>(() => ({ s, siap, alamat, jumlahItem, tambah, buatPesanan, kirimChat, ...aksi }), [s, siap, alamat, jumlahItem, tambah, buatPesanan, kirimChat, aksi]);
 
   return <Ctx.Provider value={nilai}>{children}</Ctx.Provider>;
 }

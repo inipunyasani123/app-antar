@@ -5,8 +5,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ikon, type NamaIkon } from '@/components/Ikon';
 import { LogoPincuk, UratDaun } from '@/components/Motif';
 import { Chip, Judul, SubJudul, Tombol } from '@/components/ui';
-import { meta, SITUS, judulHalaman } from '@/lib/seo';
-import { useStore } from '@/lib/store';
+import { judulHalaman, meta, SITUS } from '@/lib/seo';
+import { useSekarang, useStore } from '@/lib/store';
+import { warungById } from '@/lib/data';
+import { KartuWarungRingkas } from '@/components/Warung';
 import { huruf, radius, warna } from '@/lib/theme';
 import { useJudulDokumen } from '@/lib/judul';
 
@@ -17,7 +19,10 @@ export function generateMetadata() {
 export default function Saya() {
   useJudulDokumen(judulHalaman('Akun Saya'));
   const ins = useSafeAreaInsets();
-  const { s, siap, pilihBayar, resetDemo } = useStore();
+  const { s, siap, pilihBayar, resetDemo, setKenalan } = useStore();
+  const now = useSekarang(60000);
+  const [buka, setBuka] = useState<number | null>(null);
+  const favorit = siap ? s.favorit.map((id) => warungById(id)).filter(Boolean) : [];
   const [yakin, setYakin] = useState(false);
   const [selesai, setSelesai] = useState(false);
   return (
@@ -41,7 +46,53 @@ export default function Saya() {
             <Chip label="QRIS (simulasi)" ikon="qr" aktif={s.bayar === 'qris'} onPress={() => pilihBayar('qris')} />
           </View>
 
-          <View style={gaya.tentang}>
+          <SubJudul style={{ marginTop: 14 }}>Warung favorit</SubJudul>
+          {favorit.length ? (
+            <View style={{ gap: 10 }}>
+              {favorit.map((w) => (
+                <KartuWarungRingkas key={w!.id} w={w!} now={now} />
+              ))}
+            </View>
+          ) : (
+            <View style={gaya.favKosong}>
+              <Ikon nama="hati" ukuran={22} warna={warna.sambal} />
+              <Text style={[gaya.kecil, { flex: 1 }]}>Ketuk ikon hati di halaman warung untuk menyimpannya di sini.</Text>
+            </View>
+          )}
+
+          <SubJudul style={{ marginTop: 14 }}>Bantuan</SubJudul>
+          <View style={gaya.bantuan}>
+            {TANYA.map((t, i) => (
+              <View key={t.q} style={i < TANYA.length - 1 ? gaya.bantuanGaris : undefined}>
+                <Pressable role="button" aria-expanded={buka === i} onPress={() => setBuka(buka === i ? null : i)} style={gaya.tanya}>
+                  <Ikon nama="tanya" ukuran={20} warna={warna.daunTua} />
+                  <Text style={gaya.tanyaTeks}>{t.q}</Text>
+                  <View style={{ transform: [{ rotate: buka === i ? '180deg' : '0deg' }] }}>
+                    <Ikon nama="bawah" ukuran={18} warna={warna.tinta} />
+                  </View>
+                </Pressable>
+                {buka === i ? <Text style={gaya.jawab}>{t.a}</Text> : null}
+              </View>
+            ))}
+          </View>
+          <Tombol label="Lihat pengantar lagi" varian="garis" kecil ikon="info" onPress={() => setKenalan(false)} style={{ alignSelf: 'flex-start' }} />
+          {siap && !s.kenalan ? <Text style={gaya.kecil}>Pengantar tampil lagi di Beranda.</Text> : null}
+
+          <SubJudul style={{ marginTop: 14 }}>Data demo</SubJudul>
+          <Text style={gaya.kecil}>Menghapus keranjang, pesanan, chat, dan alamat tambahan, lalu mengembalikan contoh awal.</Text>
+          {selesai ? (
+            <Text style={[gaya.kecil, { color: warna.daun, fontFamily: huruf.tebal }]} aria-live="polite">
+              Data demo sudah dikembalikan ke awal.
+            </Text>
+          ) : yakin ? (
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Tombol label="Ya, hapus" varian="utama" kecil ikon="sampah" onPress={() => { resetDemo(); setYakin(false); setSelesai(true); }} style={{ flex: 1 }} />
+              <Tombol label="Batal" varian="garis" kecil onPress={() => setYakin(false)} style={{ flex: 1 }} />
+            </View>
+          ) : (
+            <Tombol label="Atur ulang data demo" varian="garis" kecil ikon="ulang" onPress={() => setYakin(true)} />
+          )}
+          <View style={[gaya.tentang, { marginTop: 18 }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
               <LogoPincuk ukuran={44} latar={warna.sambal} />
               <View style={{ flex: 1 }}>
@@ -63,20 +114,6 @@ export default function Saya() {
             )}
           </View>
 
-          <SubJudul style={{ marginTop: 14 }}>Data demo</SubJudul>
-          <Text style={gaya.kecil}>Menghapus keranjang, pesanan, chat, dan alamat tambahan, lalu mengembalikan contoh awal.</Text>
-          {selesai ? (
-            <Text style={[gaya.kecil, { color: warna.daun, fontFamily: huruf.tebal }]} aria-live="polite">
-              Data demo sudah dikembalikan ke awal.
-            </Text>
-          ) : yakin ? (
-            <View style={{ flexDirection: 'row', gap: 10 }}>
-              <Tombol label="Ya, hapus" varian="utama" kecil ikon="sampah" onPress={() => { resetDemo(); setYakin(false); setSelesai(true); }} style={{ flex: 1 }} />
-              <Tombol label="Batal" varian="garis" kecil onPress={() => setYakin(false)} style={{ flex: 1 }} />
-            </View>
-          ) : (
-            <Tombol label="Atur ulang data demo" varian="garis" kecil ikon="ulang" onPress={() => setYakin(true)} />
-          )}
         </View>
       </ScrollView>
     </View>
@@ -100,7 +137,20 @@ function Baris({ href, ikon, judul, sub }: { href: string; ikon: NamaIkon; judul
   );
 }
 
+const TANYA = [
+  { q: 'Kenapa warung kadang tidak bisa dipesan?', a: 'Tiap warung punya jam buka sendiri dalam WIB, termasuk hari libur dan jam istirahat. Pesanan ditutup 15 menit sebelum warung tutup supaya dapur sempat memasak.' },
+  { q: 'Bagaimana ongkir dihitung?', a: 'Dari panjang jalan di peta Tirtalaya antara warung dan alamat aktifmu: Rp6.000 untuk 2 km pertama, lalu Rp1.000 per 500 m. Jarak maksimal 6 km.' },
+  { q: 'Bisa minta kuah atau sambal dipisah?', a: 'Bisa. Ketuk menu untuk membuka pilihannya: kuah dipisah, level sambal, tambahan lauk, atau catatan khusus. Pilihan itu ikut tercetak di nota.' },
+  { q: 'Bagaimana membatalkan pesanan?', a: 'Selama pesanan masih "diterima warung" (sebelum dimasak), tombol Batalkan ada di halaman Lacak. Setelah dimasak, pesanan tidak bisa dibatalkan.' },
+];
+
 const gaya = StyleSheet.create({
+  favKosong: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: warna.putih, borderRadius: radius.besar, borderWidth: 1, borderColor: warna.garis, padding: 14 },
+  bantuan: { backgroundColor: warna.putih, borderRadius: radius.besar, borderWidth: 1, borderColor: warna.garis, paddingHorizontal: 12 },
+  bantuanGaris: { borderBottomWidth: 1, borderColor: warna.garis },
+  tanya: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 52, paddingVertical: 8 },
+  tanyaTeks: { flex: 1, fontFamily: huruf.tebal, fontSize: 14.5, lineHeight: 20, color: warna.tinta },
+  jawab: { fontFamily: huruf.sedang, fontSize: 14, lineHeight: 20, color: warna.tinta, paddingBottom: 12, paddingLeft: 30 },
   kepala: { backgroundColor: warna.daun, paddingHorizontal: 16, paddingBottom: 20, overflow: 'hidden' },
   sapa: { fontFamily: huruf.sedang, fontSize: 14.5, lineHeight: 20, color: '#E8F0DD', marginTop: 4 },
   baris: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: warna.putih, borderRadius: radius.besar, padding: 12, borderWidth: 1, borderColor: warna.garis },

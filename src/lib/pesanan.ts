@@ -1,11 +1,12 @@
-import { KELURAHAN, KURIR, warungById, type Kurir } from './data';
+import { KELURAHAN, KURIR, warungById, type Kurir, type PilihanMenu } from './data';
 import { rupiah } from './harga';
 import { posisiDiRute, rute, type Titik } from './peta';
 
 /** Simulasi pelacakan dipercepat: 1 menit di aplikasi = 4 detik sungguhan. */
 export const PERCEPAT = 15;
 
-export type ItemPesanan = { menuId: string; nama: string; harga: number; qty: number };
+export type ItemPesanan = { menuId: string; nama: string; harga: number; qty: number; pilih?: PilihanMenu; opsiTeks?: string; catatan?: string };
+export type Penilaian = { nilai: number; tanda: string[]; catatan: string; waktu: number };
 export type AlamatSnap = { label: string; detail: string; patokan: string; x: number; y: number };
 
 export type Pesanan = {
@@ -51,6 +52,13 @@ export type StatusPesanan = {
 
 const DURASI_TERIMA = 1.5;
 const DURASI_AMBIL = 2;
+
+/** Rentang jam tiba (jam simulasi), mis. "07.13–07.18". Saat sudah sampai: jam sampai saja. */
+export function rentangTiba(s: StatusPesanan): { dari: number; sampai: number; tiba: boolean } {
+  const t = s.mulai[4];
+  if (s.tahap >= 5) return { dari: t, sampai: t, tiba: true };
+  return { dari: t - 2 * 60000, sampai: t + 3 * 60000, tiba: false };
+}
 
 export function durasiTahap(p: Pesanan): number[] {
   return [DURASI_TERIMA, p.masakMenit, DURASI_AMBIL, p.jalanMenit];

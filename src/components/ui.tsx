@@ -105,23 +105,25 @@ export const TombolIkon = forwardRef<ComponentRef<typeof View>, Omit<PressablePr
   },
 );
 
-export function Chip({ label, aktif, onPress, ikon, aksen = warna.tinta }: { label: string; aktif?: boolean; onPress?: () => void; ikon?: NamaIkon; aksen?: string }) {
+export const Chip = forwardRef<ComponentRef<typeof View>, Omit<PressableProps, 'style' | 'children'> & { label: string; aktif?: boolean; ikon?: NamaIkon; aksen?: string }>(function Chip(
+  { label, aktif, onPress, ikon, aksen = warna.tinta, ...rest },
+  ref,
+) {
+  const tombol = !!onPress || 'href' in rest;
   return (
     <Pressable
-      role={onPress ? 'button' : undefined}
-      aria-pressed={onPress ? !!aktif : undefined}
+      ref={ref}
+      role={tombol ? 'button' : undefined}
+      aria-pressed={onPress && !('href' in rest) ? !!aktif : undefined}
       onPress={onPress}
-      style={({ pressed }) => [
-        gaya.chip,
-        { backgroundColor: aktif ? aksen : warna.putih, borderColor: aktif ? aksen : warna.garisTegas },
-        pressed && { opacity: 0.85 },
-      ]}
+      {...rest}
+      style={StyleSheet.flatten([gaya.chip, { backgroundColor: aktif ? aksen : warna.putih, borderColor: aktif ? aksen : warna.garisTegas }])}
     >
       {ikon ? <Ikon nama={ikon} ukuran={16} warna={aktif ? warna.kertas : warna.tinta} /> : null}
       <Text style={[gaya.chipTeks, { color: aktif ? warna.kertas : warna.tinta }]}>{label}</Text>
     </Pressable>
   );
-}
+});
 
 export function Lencana({ teks, latar = warna.kunyitMuda, fg = warna.tinta, style }: { teks: string; latar?: string; fg?: string; style?: StyleProp<ViewStyle> }) {
   return (
@@ -147,9 +149,9 @@ export const gaya = StyleSheet.create({
     gap: 8,
     ...(Platform.OS === 'web' ? ({ cursor: 'pointer', userSelect: 'none' } as object) : null),
   },
-  tombolKecil: { minHeight: 40, paddingHorizontal: 14 },
+  tombolKecil: { minHeight: 44, paddingHorizontal: 14 },
   tombolTeks: { fontFamily: huruf.hitam, fontSize: 16, lineHeight: 22 },
-  chip: { minHeight: 38, paddingHorizontal: 14, borderRadius: radius.pil, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', gap: 6 },
+  chip: { minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pil, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', gap: 6 },
   chipTeks: { fontFamily: huruf.tebal, fontSize: 14, lineHeight: 19 },
   kartu: { backgroundColor: warna.putih, borderRadius: radius.besar, borderWidth: 1, borderColor: warna.garis },
 });

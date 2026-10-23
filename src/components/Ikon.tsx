@@ -25,21 +25,27 @@ export type NamaIkon =
   | 'kirim'
   | 'info'
   | 'ulang'
-  | 'percepat';
+  | 'percepat'
+  | 'wajan'
+  | 'rumah'
+  | 'cabai'
+  | 'hati'
+  | 'tanya'
+  | 'bawah';
 
-type Props = { nama: NamaIkon; ukuran?: number; warna?: string; tebal?: number };
+type Props = { nama: NamaIkon; ukuran?: number; warna?: string; tebal?: number; isi?: string };
 
 /** Ikon garis buatan sendiri (24×24), dekoratif: label ada di elemen induknya. */
-export function Ikon({ nama, ukuran = 22, warna: w = warna.tinta, tebal = 2 }: Props) {
+export function Ikon({ nama, ukuran = 22, warna: w = warna.tinta, tebal = 2, isi: fillIsi }: Props) {
   const g = { stroke: w, strokeWidth: tebal, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' };
   return (
     <Svg width={ukuran} height={ukuran} viewBox="0 0 24 24" aria-hidden focusable={false}>
-      {isi(nama, g, w)}
+      {gambar(nama, g, w, fillIsi)}
     </Svg>
   );
 }
 
-function isi(nama: NamaIkon, g: object, w: string) {
+function gambar(nama: NamaIkon, g: object, w: string, fillIsi?: string) {
   switch (nama) {
     case 'beranda':
       return (
@@ -159,5 +165,39 @@ function isi(nama: NamaIkon, g: object, w: string) {
       return <Path d="M5 12a7 7 0 0 1 12-4.9L19 9M19 4.5V9h-4.5M19 12a7 7 0 0 1-12 4.9L5 15M5 19.5V15h4.5" {...g} />;
     case 'percepat':
       return <Path d="M4.5 6.5 11 12l-6.5 5.5zM12.5 6.5 19 12l-6.5 5.5z" {...g} />;
+    case 'wajan':
+      return (
+        <>
+          <Path d="M3.5 11.5h13a6.5 6.5 0 0 1-13 0z" {...g} />
+          <Path d="M16.5 11.5h4M8 8c-1-1.3 1-2.2 0-3.5M11.5 8c-1-1.3 1-2.2 0-3.5" {...g} />
+        </>
+      );
+    case 'rumah':
+      return (
+        <>
+          <Path d="M4 11 12 4.5 20 11" {...g} />
+          <Path d="M6.5 9.5V19.5h11V9.5" {...g} />
+          <Path d="M10.5 19.5v-5h3v5" {...g} />
+        </>
+      );
+    case 'cabai':
+      return (
+        <>
+          <Path d="M15.5 6.5c-5 .5-10 5-11 12.5 6-1.5 12-6 12.5-11z" {...g} fill={fillIsi ?? 'none'} />
+          <Path d="M15.5 6.5c.5-1.5 1.5-2.5 3-3M17 8c1.5 0 2.5.5 3 1.5" {...g} />
+        </>
+      );
+    case 'hati':
+      return <Path d="M12 19.5s-7.5-4.6-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.4-7.5 10-7.5 10z" {...g} fill={fillIsi ?? 'none'} />;
+    case 'tanya':
+      return (
+        <>
+          <Circle cx={12} cy={12} r={8.5} {...g} />
+          <Path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.6" {...g} />
+          <Circle cx={12} cy={16.6} r={0.6} fill={w} stroke={w} strokeWidth={1.2} />
+        </>
+      );
+    case 'bawah':
+      return <Path d="m6 9 6 6 6-6" {...g} />;
   }
 }

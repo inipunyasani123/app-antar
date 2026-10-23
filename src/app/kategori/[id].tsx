@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { BilahKeranjang } from '@/components/BilahKeranjang';
 import { Foto } from '@/components/Foto';
 import { Layar } from '@/components/Layar';
-import { KartuWarung } from '@/components/Warung';
+import { KartuWarungRingkas } from '@/components/Warung';
 import { KATEGORI, WARUNG } from '@/lib/data';
 import { meta, judulHalaman } from '@/lib/seo';
 import { useSekarang } from '@/lib/store';
@@ -38,9 +38,9 @@ export default function HalamanKategori() {
           </View>
         </View>
         <Text style={gaya.jumlah}>{daftar.length} warung · jam buka mengikuti WIB</Text>
-        <View style={{ gap: 14 }}>
+        <View style={{ gap: 10 }}>
           {daftar.map((w) => (
-            <KartuWarung key={w.id} w={w} now={now} />
+            <KartuWarungRingkas key={w.id} w={w} now={now} />
           ))}
         </View>
       </Layar>

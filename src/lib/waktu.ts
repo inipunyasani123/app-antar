@@ -36,8 +36,9 @@ export function bagianHari(ms: number): BagianHari {
 export type StatusBuka = {
   buka: boolean;
   bisaPesan: boolean;
-  label: string; // "Buka", "Tutup", "Hampir tutup", "Buka 24 jam"
-  ket: string; // "sampai 21.00" / "buka lagi Senin 05.30"
+  jenis: 'buka' | 'hampir' | 'libur' | 'istirahat' | 'belum' | 'tutup';
+  label: string; // "Buka", "Libur Jumat", "Istirahat", "Belum buka", "Tutup", "Hampir tutup", "Buka 24 jam"
+  ket: string; // "sampai 21.00" / "buka lagi Sabtu 05.30"
   tutupDalam?: number; // menit
 };
 
@@ -53,16 +54,28 @@ function sesiAktif(jadwal: Jadwal, hari: number, menit: number): [number, number
 
 const is24Jam = (jadwal: Jadwal) => Object.values(jadwal).every((s) => s.length === 1 && s[0][0] === 0 && s[0][1] >= 1440);
 
+/** "Libur tiap Jumat" / "Libur tiap Senin & Kamis" / "" */
+export function teksLibur(jadwal: Jadwal): string {
+  const libur = [1, 2, 3, 4, 5, 6, 0].filter((h) => !(jadwal[h] ?? []).length).map((h) => HARI[h]);
+  return libur.length ? `Libur tiap ${libur.join(' & ')}` : '';
+}
+
 export function statusBuka(jadwal: Jadwal, ms: number): StatusBuka {
-  if (is24Jam(jadwal)) return { buka: true, bisaPesan: true, label: 'Buka 24 jam', ket: 'setiap hari' };
+  if (is24Jam(jadwal)) return { buka: true, bisaPesan: true, jenis: 'buka', label: 'Buka 24 jam', ket: 'setiap hari' };
   const { hari, menit } = wib(ms);
   const s = sesiAktif(jadwal, hari, menit);
   if (s) {
     const sisa = s[1] - menit;
-    if (sisa <= BATAS_PESAN) return { buka: true, bisaPesan: false, label: 'Hampir tutup', ket: `pesanan terakhir ${jam(s[1] - BATAS_PESAN)}`, tutupDalam: sisa };
-    return { buka: true, bisaPesan: true, label: 'Buka', ket: sisa <= 45 ? `tutup ${jam(s[1])}, ${sisa} menit lagi` : `sampai ${jam(s[1])}`, tutupDalam: sisa };
+    if (sisa <= BATAS_PESAN) return { buka: true, bisaPesan: false, jenis: 'hampir', label: 'Hampir tutup', ket: `pesanan terakhir ${jam(s[1] - BATAS_PESAN)}`, tutupDalam: sisa };
+    return { buka: true, bisaPesan: true, jenis: 'buka', label: 'Buka', ket: sisa <= 45 ? `tutup ${jam(s[1])}, ${sisa} menit lagi` : `sampai ${jam(s[1])}`, tutupDalam: sisa };
   }
-  return { buka: false, bisaPesan: false, label: 'Tutup', ket: bukaLagi(jadwal, hari, menit) };
+  const hariIni = [...(jadwal[hari] ?? [])].sort((a, b) => a[0] - b[0]);
+  const lagi = bukaLagi(jadwal, hari, menit);
+  if (!hariIni.length) return { buka: false, bisaPesan: false, jenis: 'libur', label: `Libur ${HARI[hari]}`, ket: lagi };
+  const nanti = hariIni.find(([a]) => a > menit);
+  if (nanti && hariIni.some(([, b]) => b <= menit)) return { buka: false, bisaPesan: false, jenis: 'istirahat', label: 'Istirahat', ket: `buka lagi ${jam(nanti[0])}` };
+  if (nanti) return { buka: false, bisaPesan: false, jenis: 'belum', label: 'Belum buka', ket: `buka ${jam(nanti[0])}` };
+  return { buka: false, bisaPesan: false, jenis: 'tutup', label: 'Sudah tutup', ket: lagi };
 }
 
 function bukaLagi(jadwal: Jadwal, hari: number, menit: number): string {
@@ -72,7 +85,7 @@ function bukaLagi(jadwal: Jadwal, hari: number, menit: number): string {
     for (const [a] of sesi) {
       if (i === 0 && a <= menit) continue;
       if (i === 0) return `buka lagi ${jam(a)}`;
-      if (i === 1) return `buka lagi besok ${jam(a)}`;
+      if (i === 1) return `buka lagi besok (${HARI[h]}) ${jam(a)}`;
       return `buka lagi ${HARI[h]} ${jam(a)}`;
     }
   }

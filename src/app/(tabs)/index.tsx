@@ -5,15 +5,17 @@ import { Foto } from '@/components/Foto';
 import { Ikon } from '@/components/Ikon';
 import { LogoPincuk, Tenda, UratDaun } from '@/components/Motif';
 import { Judul, SubJudul, Tombol } from '@/components/ui';
-import { KartuWarung } from '@/components/Warung';
+import { Kenalan } from '@/components/Kenalan';
+import { ProgresTahap } from '@/components/ProgresTahap';
+import { KartuWarung, KartuWarungRingkas, KerangkaKartu } from '@/components/Warung';
 import { KATEGORI, KOTA, WARUNG, warungById, type KategoriId } from '@/lib/data';
 import { rupiah } from '@/lib/harga';
 import { rute } from '@/lib/peta';
-import { statusPesanan, TAHAP } from '@/lib/pesanan';
+import { rentangTiba, statusPesanan, TAHAP } from '@/lib/pesanan';
 import { meta, judulHalaman } from '@/lib/seo';
 import { useSekarang, useStore } from '@/lib/store';
 import { bayangan, huruf, radius, warna } from '@/lib/theme';
-import { bagianHari, jamDari, statusBuka, type BagianHari } from '@/lib/waktu';
+import { bagianHari, HARI, jam, jamDari, statusBuka, wib, type BagianHari } from '@/lib/waktu';
 import { useJudulDokumen } from '@/lib/judul';
 
 export function generateMetadata() {
@@ -31,7 +33,7 @@ export default function Beranda() {
   useJudulDokumen(judulHalaman());
   const ins = useSafeAreaInsets();
   const now = useSekarang(30000);
-  const { s, siap, alamat, pesanLagi } = useStore();
+  const { s, siap, alamat, pesanLagi, setKenalan } = useStore();
   const bagian = now ? bagianHari(now) : 'siang';
   const sapa = now ? SAPAAN[bagian] : { judul: 'Mau makan apa?', utama: 'nasi' as KategoriId };
 
@@ -42,8 +44,22 @@ export default function Beranda() {
   // Ubin besar tetap (supaya gambar terbesar sudah ada di HTML statis); kategori yang pas dengan jam WIB diberi tanda setelah jam diketahui.
   const utama = KATEGORI.find((k) => k.id === 'nasi')!;
   const lain = KATEGORI.filter((k) => k.id !== 'nasi');
-  const pas = now ? sapa.utama : null;
   const jumlahDi = (id: KategoriId) => WARUNG.filter((w) => w.kategori.includes(id)).length;
+  const bukaDi = (id: KategoriId) => buka.filter((x) => x.w.kategori.includes(id)).length;
+  // "Pas jam segini" hanya kalau memang ada warung kategori itu yang bisa dipesan; kalau tidak, sapaan jujur + sarankan kategori lain.
+  let pas: KategoriId | null = null;
+  let judulSapa = sapa.judul;
+  if (now) {
+    if (bukaDi(sapa.utama) > 0) pas = sapa.utama;
+    else {
+      const alt = KATEGORI.filter((k) => k.id !== sapa.utama).sort((a, b) => bukaDi(b.id) - bukaDi(a.id))[0];
+      if (alt && bukaDi(alt.id) > 0) {
+        pas = alt.id;
+        judulSapa = `Warung ${KATEGORI.find((k) => k.id === sapa.utama)!.nama.toLowerCase()} lagi sepi. Coba ${alt.nama.toLowerCase()}?`;
+      }
+    }
+  }
+  const liburHariIni = now ? WARUNG.filter((w) => !(w.jadwal[wib(now).hari] ?? []).length) : [];
 
   const berjalan = siap && now ? s.pesanan.find((p) => !p.contoh && !statusPesanan(p, now).selesai) : undefined;
   const terakhir = siap ? s.pesanan.find((p) => !p.batal && (!now || statusPesanan(p, now).selesai)) : undefined;
@@ -72,10 +88,12 @@ export default function Beranda() {
             </Link>
           </View>
           <Judul level={1} ukuran={30} warna={warna.kertas} style={{ marginTop: 18 }}>
-            {sapa.judul}
+            {judulSapa}
           </Judul>
           <Text style={gaya.subKepala}>
-            {now ? `${buka.length} dari ${WARUNG.length} warung bisa pesan · ${jamDari(now)} WIB` : `Warung tetangga di ${KOTA}, Jawa Timur`}
+            {now
+              ? `${buka.length} dari ${WARUNG.length} warung bisa pesan · ${jamDari(now)} WIB${liburHariIni.length ? ` · ${liburHariIni.length} libur ${HARI[wib(now).hari]}` : ''}`
+              : `Warung tetangga di ${KOTA}, Jawa Timur`}
           </Text>
           <Link href="/cari" asChild>
             <Pressable style={gaya.cari}>
@@ -87,18 +105,7 @@ export default function Beranda() {
         <Tenda warnaTenda={warna.daunTua} tinggi={14} />
 
         <View style={gaya.isi}>
-          {berjalan ? (
-            <Link href={`/lacak?id=${berjalan.id}`} asChild>
-              <Pressable style={gaya.berjalan}>
-                <Ikon nama="motor" ukuran={26} warna={warna.tinta} />
-                <View style={{ flex: 1 }}>
-                  <Text style={gaya.berjalanKecil}>{warungById(berjalan.warungId)?.nama}</Text>
-                  <Text style={gaya.berjalanJudul}>{TAHAP[statusPesanan(berjalan, now!).tahap]?.judul}</Text>
-                </View>
-                <Text style={gaya.berjalanAksi}>Lacak</Text>
-              </Pressable>
-            </Link>
-          ) : null}
+          {berjalan && now ? <KartuBerjalan id={berjalan.id} /> : null}
 
           {/* bento kategori */}
           <SubJudul style={{ marginTop: 18, marginBottom: 10 }}>Mau yang mana?</SubJudul>
@@ -129,7 +136,11 @@ export default function Beranda() {
             </Link>
           </View>
 
-          {!siap ? <View style={[gaya.ulang, { minHeight: 150, borderStyle: 'dashed' }]} aria-hidden /> : null}
+          {!siap ? (
+            <View style={{ marginTop: 18 }}>
+              <KerangkaKartu />
+            </View>
+          ) : null}
           {terakhir && wTerakhir ? (
             <View style={[gaya.ulang, bayangan]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -159,9 +170,7 @@ export default function Beranda() {
 
           <SubJudul style={{ marginTop: 22, marginBottom: 10 }}>{now ? 'Bisa dipesan sekarang' : `Warung di ${KOTA}`}</SubJudul>
           <View style={{ gap: 14 }}>
-            {buka.map(({ w }) => (
-              <KartuWarung key={w.id} w={w} now={now} />
-            ))}
+            {buka.map(({ w }, i) => (i < 3 ? <KartuWarung key={w.id} w={w} now={now} /> : <KartuWarungRingkas key={w.id} w={w} now={now} />))}
           </View>
           {tutup.length ? (
             <>
@@ -169,7 +178,7 @@ export default function Beranda() {
               <Text style={gaya.catatan}>Jam buka mengikuti WIB. Menu tetap bisa dilihat, tapi pesanan baru dibuka saat warung buka.</Text>
               <View style={{ gap: 14, marginTop: 10 }}>
                 {tutup.map(({ w }) => (
-                  <KartuWarung key={w.id} w={w} now={now} />
+                  <KartuWarungRingkas key={w.id} w={w} now={now} />
                 ))}
               </View>
             </>
@@ -179,6 +188,37 @@ export default function Beranda() {
           </Text>
         </View>
       </ScrollView>
+      <Kenalan terbuka={siap && !s.kenalan} onSelesai={() => setKenalan(true)} />
+    </View>
+  );
+}
+
+/** Kartu pesanan berjalan: garis 5 tahap + rentang jam tiba + tombol Lacak. Kuning kunyit agar beda dari kepala hijau. */
+function KartuBerjalan({ id }: { id: string }) {
+  const now = useSekarang(2000);
+  const { s } = useStore();
+  const p = s.pesanan.find((x) => x.id === id);
+  if (!p || !now) return null;
+  const st = statusPesanan(p, now);
+  const w = warungById(p.warungId);
+  const eta = rentangTiba(st);
+  return (
+    <View style={gaya.berjalan}>
+      <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={gaya.berjalanKecil}>Pesanan berjalan · {w?.nama}</Text>
+          <Text style={gaya.berjalanJudul}>{st.tahap === 0 ? 'Menunggu pembayaran QRIS' : TAHAP[st.tahap]?.judul}</Text>
+          {st.tahap > 0 ? <Text style={gaya.berjalanEta}>Tiba ±{jam(wib(eta.sampai).menit)} WIB</Text> : null}
+        </View>
+        <Link href={`/lacak?id=${p.id}`} asChild>
+          <Tombol label={st.tahap === 0 ? 'Bayar' : 'Lacak'} varian="gelap" kecil ikonKanan="kanan" />
+        </Link>
+      </View>
+      {st.tahap > 0 ? (
+        <View style={{ marginTop: 10 }}>
+          <ProgresTahap tahap={st.tahap} ringkas />
+        </View>
+      ) : null}
     </View>
   );
 }
@@ -218,7 +258,8 @@ const gaya = StyleSheet.create({
   cari: { flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: warna.putih, borderRadius: radius.pil, paddingHorizontal: 16, minHeight: 48, marginTop: 14 },
   cariTeks: { fontFamily: huruf.sedang, fontSize: 15, color: warna.tinta2 },
   isi: { paddingHorizontal: 16 },
-  berjalan: { marginTop: 16, flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: warna.kunyit, borderRadius: radius.besar, padding: 14 },
+  berjalan: { marginTop: 16, backgroundColor: warna.kunyitMuda, borderRadius: radius.besar, padding: 14, borderWidth: 2, borderColor: warna.kunyit },
+  berjalanEta: { fontFamily: huruf.display, fontSize: 18, lineHeight: 24, color: warna.tinta, marginTop: 2, fontVariant: ['tabular-nums'] },
   berjalanKecil: { fontFamily: huruf.tebal, fontSize: 12.5, lineHeight: 17, color: warna.tinta },
   berjalanJudul: { fontFamily: huruf.hitam, fontSize: 16, lineHeight: 21, color: warna.tinta },
   berjalanAksi: { fontFamily: huruf.hitam, fontSize: 15, color: warna.tinta, textDecorationLine: 'underline' },

@@ -1,9 +1,11 @@
 import { Link, router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Cap, TepiNota } from '@/components/Motif';
+import { Ikon } from '@/components/Ikon';
+import { Kosong } from '@/components/Kosong';
+import { Cap, TepiNota, UratDaun } from '@/components/Motif';
 import { Judul, Lencana, SubJudul, Tombol } from '@/components/ui';
-import { warungById } from '@/lib/data';
+import { WARUNG, warungById } from '@/lib/data';
 import { rupiah } from '@/lib/harga';
 import { statusPesanan, TAHAP, type Pesanan } from '@/lib/pesanan';
 import { meta, judulHalaman } from '@/lib/seo';
@@ -27,10 +29,14 @@ export default function HalamanPesanan() {
 
   return (
     <View style={{ flex: 1 }} role="main">
-      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: ins.top + 12, paddingBottom: 28 }}>
-        <Judul level={1} ukuran={26}>
+      <View style={[gaya.kepala, { paddingTop: ins.top + 14 }]}>
+        <UratDaun />
+        <Judul level={1} ukuran={26} warna={warna.kertas}>
           Pesanan
         </Judul>
+        <Text style={gaya.kepalaSub}>Nota tersimpan di perangkat ini, lengkap dengan penilaianmu.</Text>
+      </View>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 4, paddingBottom: 28 }}>
         {!siap || !now ? (
           <Text style={gaya.catatan}>Memuat pesanan di perangkat ini…</Text>
         ) : (
@@ -43,7 +49,15 @@ export default function HalamanPesanan() {
                 ))}
               </View>
             ) : (
-              <Text style={gaya.catatan}>Belum ada pesanan yang sedang diantar.</Text>
+              <View style={gaya.kosong}>
+                <Kosong
+                  jenis="berjalan"
+                  judul="Belum ada yang diantar"
+                  teks={`${WARUNG.filter((w) => statusBuka(w.jadwal, now).bisaPesan).length} warung bisa pesan sekarang. Pesananmu akan muncul di sini lengkap dengan jam tiba.`}
+                  aksi="Lihat warung yang buka"
+                  href="/"
+                />
+              </View>
             )}
             <SubJudul style={{ marginTop: 22, marginBottom: 8 }}>Riwayat</SubJudul>
             {riwayat.length ? (
@@ -64,7 +78,8 @@ export default function HalamanPesanan() {
 }
 
 function Nota({ p, label, now, berjalan }: { p: Pesanan; label: string; now: number; berjalan?: boolean }) {
-  const { pesanLagi } = useStore();
+  const { pesanLagi, s } = useStore();
+  const nilai = s.penilaian[p.id];
   const w = warungById(p.warungId);
   const bisa = w ? statusBuka(w.jadwal, now).bisaPesan : false;
   const batal = !!p.batal;
@@ -87,12 +102,15 @@ function Nota({ p, label, now, berjalan }: { p: Pesanan; label: string; now: num
           {p.contoh ? <Lencana teks="contoh" latar={warna.kertas2} /> : null}
         </View>
         <View style={gaya.garis} />
-        {p.item.map((i) => (
-          <View key={i.menuId} style={gaya.baris}>
-            <Text style={[gaya.mono, { color: warna.tinta, flex: 1 }]}>
-              {i.qty}× {i.nama}
-            </Text>
-            <Text style={[gaya.mono, { color: warna.tinta }]}>{rupiah(i.harga * i.qty)}</Text>
+        {p.item.map((i, n) => (
+          <View key={`${i.menuId}-${n}`} style={{ marginVertical: 2 }}>
+            <View style={gaya.baris}>
+              <Text style={[gaya.mono, { color: warna.tinta, flex: 1 }]}>
+                {i.qty}× {i.nama}
+              </Text>
+              <Text style={[gaya.mono, { color: warna.tinta }]}>{rupiah(i.harga * i.qty)}</Text>
+            </View>
+            {i.opsiTeks ? <Text style={gaya.monoOpsi}>  {i.opsiTeks}</Text> : null}
           </View>
         ))}
         <View style={gaya.garis} />
@@ -100,6 +118,18 @@ function Nota({ p, label, now, berjalan }: { p: Pesanan; label: string; now: num
           <Text style={gaya.total}>Total</Text>
           <Text style={gaya.total}>{rupiah(p.total)}</Text>
         </View>
+        {nilai ? (
+          <View style={gaya.nilai}>
+            <Text style={gaya.nilaiJudul}>Penilaianmu</Text>
+            <View style={{ flexDirection: 'row', gap: 2 }} aria-label={`${nilai.nilai} dari 5 cabai`} role="img">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <Ikon key={n} nama="cabai" ukuran={18} warna={n <= nilai.nilai ? warna.sambal : warna.garisTegas} isi={n <= nilai.nilai ? warna.sambal : undefined} />
+              ))}
+            </View>
+            {nilai.tanda.length ? <Text style={gaya.nilaiTeks}>{nilai.tanda.join(' · ')}</Text> : null}
+            {nilai.catatan ? <Text style={gaya.nilaiTeks}>“{nilai.catatan}”</Text> : null}
+          </View>
+        ) : null}
         <View style={{ flexDirection: 'row', gap: 10, marginTop: 12 }}>
           <Link href={`/lacak?id=${p.id}`} asChild>
             <Tombol label={berjalan ? 'Lacak' : 'Lihat nota'} varian={berjalan ? 'utama' : 'garis'} kecil ikon={berjalan ? 'motor' : 'nota'} style={{ flex: 1 }} />
@@ -127,6 +157,13 @@ function Nota({ p, label, now, berjalan }: { p: Pesanan; label: string; now: num
 
 const gaya = StyleSheet.create({
   catatan: { fontFamily: huruf.sedang, fontSize: 13.5, lineHeight: 19, color: warna.tinta2 },
+  kepala: { backgroundColor: warna.daun, paddingHorizontal: 16, paddingBottom: 16, overflow: 'hidden' },
+  kepalaSub: { fontFamily: huruf.sedang, fontSize: 14, lineHeight: 20, color: '#E8F0DD', marginTop: 2 },
+  kosong: { backgroundColor: warna.putih, borderRadius: 22, borderWidth: 1, borderColor: warna.garis },
+  monoOpsi: { fontFamily: huruf.mono, fontSize: 12, lineHeight: 17, color: warna.daunTua },
+  nilai: { marginTop: 10, backgroundColor: '#F2F7EC', borderRadius: 14, padding: 10, gap: 4 },
+  nilaiJudul: { fontFamily: huruf.hitam, fontSize: 13.5, color: warna.daunTua },
+  nilaiTeks: { fontFamily: huruf.sedang, fontSize: 13, lineHeight: 18, color: warna.tinta },
   nota: { backgroundColor: warna.putih, paddingHorizontal: 16, paddingVertical: 10 },
   warung: { fontFamily: huruf.hitam, fontSize: 16.5, lineHeight: 22, color: warna.tinta },
   mono: { fontFamily: huruf.mono, fontSize: 12.5, lineHeight: 18, color: warna.tinta2 },
