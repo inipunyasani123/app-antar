@@ -70,6 +70,14 @@ const f = {
   tehHangat: require('../../assets/images/menu/teh-hangat.webp'),
   tehHangat2: require('../../assets/images/menu/teh-hangat-2.webp'),
   wedangRonde: require('../../assets/images/menu/wedang-ronde.webp'),
+  pecelTelur: require('../../assets/images/menu/pecel-telur.webp'),
+  tahu2: require('../../assets/images/menu/tahu-2.webp'),
+  tahu3: require('../../assets/images/menu/tahu-3.webp'),
+  telurAsin2: require('../../assets/images/menu/telur-asin-2.webp'),
+  esJeruk2: require('../../assets/images/menu/es-jeruk-2.webp'),
+  pisang2: require('../../assets/images/menu/pisang-2.webp'),
+  uwuh2: require('../../assets/images/menu/uwuh-2.webp'),
+  esTeh6: require('../../assets/images/menu/es-teh-6.webp'),
 };
 
 /** Versi kecil (256×192) untuk gambar menu di daftar; versi 640×480 untuk sampul & ubin. */
@@ -125,6 +133,14 @@ const k = {
   tehHangat: require('../../assets/images/menu/kecil/teh-hangat.webp'),
   tehHangat2: require('../../assets/images/menu/kecil/teh-hangat-2.webp'),
   wedangRonde: require('../../assets/images/menu/kecil/wedang-ronde.webp'),
+  pecelTelur: require('../../assets/images/menu/kecil/pecel-telur.webp'),
+  tahu2: require('../../assets/images/menu/kecil/tahu-2.webp'),
+  tahu3: require('../../assets/images/menu/kecil/tahu-3.webp'),
+  telurAsin2: require('../../assets/images/menu/kecil/telur-asin-2.webp'),
+  esJeruk2: require('../../assets/images/menu/kecil/es-jeruk-2.webp'),
+  pisang2: require('../../assets/images/menu/kecil/pisang-2.webp'),
+  uwuh2: require('../../assets/images/menu/kecil/uwuh-2.webp'),
+  esTeh6: require('../../assets/images/menu/kecil/es-teh-6.webp'),
 };
 
 const besar = new Map<unknown, ImageSourcePropType>((Object.keys(k) as (keyof typeof k)[]).map((n) => [k[n], f[n]]));
@@ -265,7 +281,7 @@ export const WARUNG: Warung[] = [
         judul: 'Andalan',
         menu: [
           { id: 'pecel-pincuk', nama: 'Nasi pecel pincuk', ket: 'Nasi, sayur rebus, kembang turi, sambal kacang, dan rempeyek. Dibungkus pincuk daun pisang.', harga: 10000, foto: k.pecel, opsi: [PEDAS, tambahan(T.telur, T.tempe, T.peyek)] },
-          { id: 'pecel-telur', nama: 'Pecel + telur ceplok', ket: 'Nasi pecel lengkap dengan telur ceplok setengah matang.', harga: 13000, foto: k.pecel, opsi: [PEDAS, tambahan(T.tempe, T.peyek)] },
+          { id: 'pecel-telur', nama: 'Pecel + telur ceplok', ket: 'Nasi pecel lengkap dengan telur ceplok setengah matang.', harga: 13000, foto: k.pecelTelur, opsi: [PEDAS, tambahan(T.tempe, T.peyek)] },
           { id: 'urap', nama: 'Urap daun kates', ket: 'Daun pepaya, kacang panjang, dan kelapa parut berbumbu. Pahitnya pas.', harga: 8000, foto: k.urap, opsi: [PEDAS] },
         ],
       },
@@ -274,7 +290,7 @@ export const WARUNG: Warung[] = [
         menu: [
           { id: 'tempe', nama: 'Tempe goreng', ket: 'Dua potong, digoreng kering.', harga: 3000, foto: k.tempe },
           { id: 'rempeyek', nama: 'Rempeyek kacang', ket: 'Satu bungkus isi lima keping.', harga: 5000, foto: k.rempeyek },
-          { id: 'tahu-pecel', nama: 'Tahu goreng', ket: 'Dua potong tahu putih goreng.', harga: 3000, foto: k.tahu },
+          { id: 'tahu-pecel', nama: 'Tahu goreng', ket: 'Dua potong tahu putih goreng.', harga: 3000, foto: k.tahu2 },
         ],
       },
       {
@@ -374,7 +390,7 @@ export const WARUNG: Warung[] = [
         judul: 'Tambahan & minum',
         menu: [
           { id: 'tahu-bakso', nama: 'Tahu goreng tepung', ket: 'Lima potong, cocol sambal.', harga: 6000, foto: k.tahu },
-          { id: 'es-jeruk', nama: 'Es jeruk', ket: 'Jeruk peras segar, es batu dibungkus terpisah.', harga: 6000, foto: k.esJeruk, opsi: [GULA, ES] },
+          { id: 'es-jeruk', nama: 'Es jeruk', ket: 'Jeruk peras segar, es batu dibungkus terpisah.', harga: 6000, foto: k.esJeruk2, opsi: [GULA, ES] },
           { id: 'es-teh-bakso', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh2, opsi: [GULA, ES] },
         ],
       },
@@ -467,8 +483,8 @@ export const WARUNG: Warung[] = [
         judul: 'Teman ngopi',
         menu: [
           { id: 'nasi-bungkus', nama: 'Nasi bungkus sambal teri', ket: 'Nasi kepal, sambal teri, dibungkus kertas minyak.', harga: 4000, foto: k.nasiBungkus },
-          { id: 'pisang-kopi', nama: 'Pisang goreng', ket: 'Tiga potong, masih hangat.', harga: 5000, foto: k.pisang },
-          { id: 'tahu-kopi', nama: 'Tahu goreng tepung', ket: 'Lima potong.', harga: 6000, foto: k.tahu },
+          { id: 'pisang-kopi', nama: 'Pisang goreng', ket: 'Tiga potong, masih hangat.', harga: 5000, foto: k.pisang2 },
+          { id: 'tahu-kopi', nama: 'Tahu goreng tepung', ket: 'Lima potong.', harga: 6000, foto: k.tahu3 },
         ],
       },
     ],
@@ -492,7 +508,7 @@ export const WARUNG: Warung[] = [
         menu: [
           { id: 'sego-jagung', nama: 'Sego jagung urap', ket: 'Nasi jagung, urap kecambah, ikan asin goreng, sambal bawang.', harga: 9000, foto: k.nasiJagung, opsi: [{ id: 'lauk', judul: 'Lauk', jenis: 'satu', bawaan: 'asin', pilihan: [{ id: 'asin', label: 'Ikan asin' }, { id: 'tempe', label: 'Tempe goreng' }, { id: 'dadar', label: 'Telur dadar', harga: 2000 }] }, PEDAS] },
           { id: 'nasi-kuning', nama: 'Nasi kuning', ket: 'Nasi kunyit santan, mi goreng, sambal goreng, serundeng, telur.', harga: 11000, foto: k.nasiKuning, opsi: [PEDAS, tambahan(T.perkedel, T.kerupuk)] },
-          { id: 'telur-asin-jagung', nama: 'Telur asin', ket: 'Satu butir, dibelah dua.', harga: 5000, foto: k.telurAsin },
+          { id: 'telur-asin-jagung', nama: 'Telur asin', ket: 'Satu butir, dibelah dua.', harga: 5000, foto: k.telurAsin2 },
         ],
       },
       {
@@ -524,7 +540,7 @@ export const WARUNG: Warung[] = [
       },
       {
         judul: 'Minum',
-        menu: [{ id: 'es-teh-lontong', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh, opsi: [GULA, ES] }],
+        menu: [{ id: 'es-teh-lontong', nama: 'Es teh manis', ket: 'Gelas besar.', harga: 4000, foto: k.esTeh6, opsi: [GULA, ES] }],
       },
     ],
   },
@@ -600,7 +616,7 @@ export const WARUNG: Warung[] = [
         menu: [
           { id: 'wedang-ronde', nama: 'Wedang ronde', ket: 'Ronde isi kacang, kolang-kaling, kacang sangrai, kuah jahe serai panas.', harga: 8000, foto: k.wedangRonde, opsi: [{ id: 'jahe', judul: 'Jahe', jenis: 'satu', bawaan: 'sedang', pilihan: [{ id: 'sedang', label: 'Sedang' }, { id: 'kuat', label: 'Jahe kuat' }] }, GULA] },
           { id: 'angsle', nama: 'Angsle', ket: 'Kuah santan hangat, ketan, putu mayang, roti tawar, kacang hijau.', harga: 9000, foto: k.angsle },
-          { id: 'wedang-uwuh-ronde', nama: 'Wedang uwuh', ket: 'Rempah secang, jahe, cengkih, kayu manis.', harga: 6000, foto: k.uwuh, opsi: [GULA] },
+          { id: 'wedang-uwuh-ronde', nama: 'Wedang uwuh', ket: 'Rempah secang, jahe, cengkih, kayu manis.', harga: 6000, foto: k.uwuh2, opsi: [GULA] },
         ],
       },
     ],
